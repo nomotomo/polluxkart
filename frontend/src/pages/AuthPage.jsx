@@ -10,6 +10,7 @@ import { Checkbox } from '../components/ui/checkbox';
 import { Separator } from '../components/ui/separator';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
+import Logo from '../components/brand/Logo';
 
 const AuthPage = () => {
   const navigate = useNavigate();
