@@ -71,11 +71,14 @@ const HomePage = () => {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link to="/store?category=electronics">
-                  <Button size="lg" variant="outline" className="border-primary/30 hover:bg-primary/5">
-                    Explore Categories
-                  </Button>
-                </Link>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-primary/30 hover:bg-primary/5"
+                  onClick={() => document.getElementById('categories-section')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Explore Categories
+                </Button>
               </div>
 
               {/* Stats */}
