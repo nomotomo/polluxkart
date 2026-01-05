@@ -15,7 +15,7 @@ const iconMap = {
 
 const CategoryGrid = () => {
   return (
-    <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="categories-section" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-20">
       <div className="text-center mb-10">
         <h2 className="font-heading text-3xl font-bold text-foreground">Shop by Category</h2>
         <p className="text-muted-foreground mt-2">Explore our wide range of products</p>
