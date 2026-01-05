@@ -1,0 +1,18 @@
+<svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#faviconGradient)"/>
+  <path d="M24 8L26.5 18.5H37L28.5 25L31 36L24 29L17 36L19.5 25L11 18.5H21.5L24 8Z" fill="white" fill-opacity="0.9"/>
+  <circle cx="19" cy="38" r="2.5" fill="white" fill-opacity="0.8"/>
+  <circle cx="29" cy="38" r="2.5" fill="white" fill-opacity="0.8"/>
+  <circle cx="36" cy="12" r="3" fill="url(#faviconAccent)"/>
+  <circle cx="38" cy="10" r="1.5" fill="white" fill-opacity="0.9"/>
+  <defs>
+    <linearGradient id="faviconGradient" x1="2" y1="2" x2="46" y2="46" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#20B2AA"/>
+      <stop offset="1" stop-color="#178F89"/>
+    </linearGradient>
+    <linearGradient id="faviconAccent" x1="33" y1="9" x2="39" y2="15" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#84CC16"/>
+      <stop offset="1" stop-color="#65A30D"/>
+    </linearGradient>
+  </defs>
+</svg>
