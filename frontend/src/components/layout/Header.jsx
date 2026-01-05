@@ -14,6 +14,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import Logo from '../brand/Logo';
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,13 +46,9 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-heading font-bold text-lg">P</span>
-            </div>
-            <span className="font-heading font-bold text-xl text-foreground hidden sm:block">
-              Pollux<span className="text-primary">Kart</span>
-            </span>
+          <Link to="/" className="shrink-0">
+            <Logo size="default" showText={true} className="hidden sm:flex" />
+            <Logo size="small" showText={false} className="sm:hidden" />
           </Link>
 
           {/* Desktop Navigation */}
