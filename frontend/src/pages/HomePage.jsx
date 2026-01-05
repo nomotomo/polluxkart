@@ -6,6 +6,7 @@ import { Card, CardContent } from '../components/ui/card';
 import PromotionBanner from '../components/home/PromotionBanner';
 import CategoryGrid from '../components/home/CategoryGrid';
 import FeaturedProducts from '../components/home/FeaturedProducts';
+import CategoriesModal from '../components/home/CategoriesModal';
 import { products } from '../data/products';
 import ProductCard from '../components/products/ProductCard';
 
