@@ -1,14 +1,15 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import {
   Search,
   SlidersHorizontal,
   Grid3X3,
   LayoutList,
-  ChevronDown,
   X,
   ChevronLeft,
   ChevronRight,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -21,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../components/ui/sheet';
 import { Separator } from '../components/ui/separator';
 import { ScrollArea } from '../components/ui/scroll-area';
+import { Alert, AlertDescription } from '../components/ui/alert';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -30,24 +32,132 @@ import {
   BreadcrumbSeparator,
 } from '../components/ui/breadcrumb';
 import ProductCard from '../components/products/ProductCard';
-import { products, categories } from '../data/products';
+import ProductService from '../services/productService';
+// Fallback mock data
+import { products as mockProducts, categories as mockCategories } from '../data/products';
 
 const ITEMS_PER_PAGE = 12;
+
+// Flag to enable/disable API integration (set to true when your backend is running)
+const USE_API = true; // Change to false to use mock data
 
 const StorePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState('grid');
   const [priceRange, setPriceRange] = useState([0, 1500]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [sortBy, setSortBy] = useState('featured');
+  const [sortBy, setSortBy] = useState('default');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  
+  // API data state
+  const [products, setProducts] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [types, setTypes] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // Selected filters
+  const [selectedBrandId, setSelectedBrandId] = useState(null);
+  const [selectedTypeId, setSelectedTypeId] = useState(null);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  // Load products from API
+  const loadProducts = useCallback(async () => {
+    if (!USE_API) {
+      // Use mock data
+      setProducts(mockProducts);
+      setTotalCount(mockProducts.length);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Map sort options to API format
+      const sortMap = {
+        'default': 'default',
+        'price-asc': 'priceAsc',
+        'price-desc': 'priceDesc',
+        'rating': 'name', // or your API's rating sort
+        'newest': 'name',
+      };
+
+      const response = await ProductService.getAllProducts(
+        currentPage,
+        ITEMS_PER_PAGE,
+        selectedBrandId,
+        selectedTypeId,
+        sortMap[sortBy] || 'default',
+        searchQuery || null
+      );
+
+      // Transform API data to match our component format
+      const transformedProducts = (response.data || []).map(product => ({
+        id: product.id,
+        name: product.name,
+        category: product.type?.name || product.typeName || 'General',
+        price: product.price,
+        originalPrice: product.originalPrice || null,
+        rating: product.rating || 4.5,
+        reviews: product.reviews || Math.floor(Math.random() * 1000) + 100,
+        image: product.imageFile || product.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500',
+        images: product.images || [product.imageFile || product.image],
+        description: product.description || product.summary || '',
+        features: product.features || [],
+        inStock: product.inStock !== false,
+        badge: product.badge || null,
+        // Keep original data for API operations
+        _original: product,
+      }));
+
+      setProducts(transformedProducts);
+      setTotalCount(response.count || transformedProducts.length);
+      console.log('Loaded products:', transformedProducts);
+    } catch (err) {
+      console.error('Failed to load products:', err);
+      setError('Failed to load products. Using offline data.');
+      // Fallback to mock data
+      setProducts(mockProducts);
+      setTotalCount(mockProducts.length);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, selectedBrandId, selectedTypeId, sortBy, searchQuery]);
+
+  // Load brands from API
+  const loadBrands = useCallback(async () => {
+    if (!USE_API) return;
+
+    try {
+      const response = await ProductService.getAllBrands();
+      setBrands(response || []);
+    } catch (err) {
+      console.error('Failed to load brands:', err);
+    }
+  }, []);
+
+  // Load types/categories from API
+  const loadTypes = useCallback(async () => {
+    if (!USE_API) return;
+
+    try {
+      const response = await ProductService.getAllTypes();
+      setTypes(response || []);
+    } catch (err) {
+      console.error('Failed to load types:', err);
+    }
+  }, []);
 
   // Initialize from URL params
   useEffect(() => {
     const category = searchParams.get('category');
     const search = searchParams.get('search');
     const page = searchParams.get('page');
+    const typeId = searchParams.get('typeId');
+    const brandId = searchParams.get('brandId');
     
     if (category) {
       setSelectedCategories([category]);
@@ -58,13 +168,37 @@ const StorePage = () => {
     if (page) {
       setCurrentPage(parseInt(page));
     }
+    if (typeId) {
+      setSelectedTypeId(typeId);
+    }
+    if (brandId) {
+      setSelectedBrandId(brandId);
+    }
   }, [searchParams]);
 
-  // Filter and sort products
+  // Load initial data
+  useEffect(() => {
+    loadBrands();
+    loadTypes();
+  }, [loadBrands, loadTypes]);
+
+  // Load products when filters change
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
+
+  // Filter products locally for mock data (API handles filtering server-side)
   const filteredProducts = useMemo(() => {
+    if (USE_API) {
+      // API already filters, just apply local price filter if needed
+      return products.filter(
+        (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
+      );
+    }
+
+    // Local filtering for mock data
     let result = [...products];
 
-    // Filter by search
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -75,17 +209,14 @@ const StorePage = () => {
       );
     }
 
-    // Filter by categories
     if (selectedCategories.length > 0) {
       result = result.filter((p) => selectedCategories.includes(p.category));
     }
 
-    // Filter by price
     result = result.filter(
       (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
     );
 
-    // Sort
     switch (sortBy) {
       case 'price-asc':
         result.sort((a, b) => a.price - b.price);
@@ -100,16 +231,21 @@ const StorePage = () => {
         result.sort((a, b) => b.id - a.id);
         break;
       default:
-        // Featured - products with badges first
         result.sort((a, b) => (b.badge ? 1 : 0) - (a.badge ? 1 : 0));
     }
 
     return result;
-  }, [searchQuery, selectedCategories, priceRange, sortBy]);
+  }, [products, searchQuery, selectedCategories, priceRange, sortBy]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const totalPages = USE_API 
+    ? Math.ceil(totalCount / ITEMS_PER_PAGE)
+    : Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+    
   const paginatedProducts = useMemo(() => {
+    if (USE_API) {
+      return filteredProducts; // API handles pagination
+    }
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
@@ -124,27 +260,46 @@ const StorePage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Handle category toggle
+  // Handle category/type toggle
   const toggleCategory = (categoryId) => {
-    setSelectedCategories((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((c) => c !== categoryId)
-        : [...prev, categoryId]
-    );
+    if (USE_API) {
+      // For API, set the type ID directly
+      setSelectedTypeId(selectedTypeId === categoryId ? null : categoryId);
+    } else {
+      setSelectedCategories((prev) =>
+        prev.includes(categoryId)
+          ? prev.filter((c) => c !== categoryId)
+          : [...prev, categoryId]
+      );
+    }
+    setCurrentPage(1);
+  };
+
+  // Handle brand toggle
+  const toggleBrand = (brandId) => {
+    setSelectedBrandId(selectedBrandId === brandId ? null : brandId);
     setCurrentPage(1);
   };
 
   // Clear all filters
   const clearFilters = () => {
     setSelectedCategories([]);
+    setSelectedBrandId(null);
+    setSelectedTypeId(null);
     setPriceRange([0, 1500]);
     setSearchQuery('');
+    setSortBy('default');
     setCurrentPage(1);
     setSearchParams({});
   };
 
+  // Combine categories from API types and mock data
+  const displayCategories = USE_API && types.length > 0 
+    ? types.map(t => ({ id: t.id, name: t.name, count: t.count || 0 }))
+    : mockCategories;
+
   const activeFiltersCount =
-    selectedCategories.length +
+    (USE_API ? (selectedBrandId ? 1 : 0) + (selectedTypeId ? 1 : 0) : selectedCategories.length) +
     (priceRange[0] > 0 || priceRange[1] < 1500 ? 1 : 0) +
     (searchQuery ? 1 : 0);
 
@@ -171,15 +326,42 @@ const StorePage = () => {
 
       <Separator />
 
-      {/* Categories */}
+      {/* Brands (from API) */}
+      {USE_API && brands.length > 0 && (
+        <>
+          <div>
+            <Label className="text-sm font-medium mb-3 block">Brands</Label>
+            <div className="space-y-3">
+              {brands.map((brand) => (
+                <div key={brand.id} className="flex items-center space-x-3">
+                  <Checkbox
+                    id={`brand-${brand.id}`}
+                    checked={selectedBrandId === brand.id}
+                    onCheckedChange={() => toggleBrand(brand.id)}
+                  />
+                  <Label
+                    htmlFor={`brand-${brand.id}`}
+                    className="text-sm font-normal cursor-pointer flex-1"
+                  >
+                    {brand.name}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+          <Separator />
+        </>
+      )}
+
+      {/* Categories/Types */}
       <div>
         <Label className="text-sm font-medium mb-3 block">Categories</Label>
         <div className="space-y-3">
-          {categories.map((category) => (
+          {displayCategories.map((category) => (
             <div key={category.id} className="flex items-center space-x-3">
               <Checkbox
                 id={category.id}
-                checked={selectedCategories.includes(category.id)}
+                checked={USE_API ? selectedTypeId === category.id : selectedCategories.includes(category.id)}
                 onCheckedChange={() => toggleCategory(category.id)}
               />
               <Label
@@ -187,9 +369,11 @@ const StorePage = () => {
                 className="text-sm font-normal cursor-pointer flex-1 flex justify-between items-center"
               >
                 <span>{category.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  ({category.count})
-                </span>
+                {category.count > 0 && (
+                  <span className="text-xs text-muted-foreground">
+                    ({category.count})
+                  </span>
+                )}
               </Label>
             </div>
           ))}
@@ -255,9 +439,17 @@ const StorePage = () => {
         <div className="mb-8">
           <h1 className="font-heading text-3xl font-bold text-foreground">All Products</h1>
           <p className="text-muted-foreground mt-1">
-            Showing {paginatedProducts.length} of {filteredProducts.length} products
+            {isLoading ? 'Loading...' : `Showing ${paginatedProducts.length} of ${USE_API ? totalCount : filteredProducts.length} products`}
           </p>
         </div>
+
+        {/* Error Alert */}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         <div className="flex gap-8">
           {/* Desktop Sidebar */}
@@ -304,14 +496,34 @@ const StorePage = () => {
 
               {/* Active Filters Tags */}
               <div className="flex flex-wrap gap-2">
-                {selectedCategories.map((cat) => (
+                {selectedBrandId && brands.length > 0 && (
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-destructive/20"
+                    onClick={() => setSelectedBrandId(null)}
+                  >
+                    {brands.find((b) => b.id === selectedBrandId)?.name}
+                    <X className="ml-1 h-3 w-3" />
+                  </Badge>
+                )}
+                {selectedTypeId && types.length > 0 && (
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-destructive/20"
+                    onClick={() => setSelectedTypeId(null)}
+                  >
+                    {types.find((t) => t.id === selectedTypeId)?.name}
+                    <X className="ml-1 h-3 w-3" />
+                  </Badge>
+                )}
+                {!USE_API && selectedCategories.map((cat) => (
                   <Badge
                     key={cat}
                     variant="secondary"
                     className="cursor-pointer hover:bg-destructive/20"
                     onClick={() => toggleCategory(cat)}
                   >
-                    {categories.find((c) => c.id === cat)?.name}
+                    {mockCategories.find((c) => c.id === cat)?.name}
                     <X className="ml-1 h-3 w-3" />
                   </Badge>
                 ))}
@@ -319,12 +531,15 @@ const StorePage = () => {
 
               {/* Sort & View Options */}
               <div className="flex items-center gap-4 ml-auto">
-                <Select value={sortBy} onValueChange={setSortBy}>
+                <Select value={sortBy} onValueChange={(value) => {
+                  setSortBy(value);
+                  setCurrentPage(1);
+                }}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="featured">Featured</SelectItem>
+                    <SelectItem value="default">Featured</SelectItem>
                     <SelectItem value="newest">Newest</SelectItem>
                     <SelectItem value="price-asc">Price: Low to High</SelectItem>
                     <SelectItem value="price-desc">Price: High to Low</SelectItem>
@@ -357,9 +572,15 @@ const StorePage = () => {
               </div>
             </div>
 
-            {/* Products Grid */}
-            {paginatedProducts.length > 0 ? (
+            {/* Loading State */}
+            {isLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-2 text-muted-foreground">Loading products...</span>
+              </div>
+            ) : paginatedProducts.length > 0 ? (
               <>
+                {/* Products Grid */}
                 <div
                   className={`grid gap-4 md:gap-6 ${
                     viewMode === 'grid'
@@ -386,7 +607,6 @@ const StorePage = () => {
                     
                     {[...Array(totalPages)].map((_, i) => {
                       const page = i + 1;
-                      // Show first, last, current, and adjacent pages
                       if (
                         page === 1 ||
                         page === totalPages ||
