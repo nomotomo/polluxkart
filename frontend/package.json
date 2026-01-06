@@ -62,10 +62,6 @@
     "lint": "eslint src/ tests/"
   },
   "jest": {
-    "roots": [
-      "<rootDir>/src",
-      "<rootDir>/tests"
-    ],
     "testMatch": [
       "<rootDir>/tests/**/*.test.{js,jsx}",
       "<rootDir>/src/**/*.test.{js,jsx}"
