@@ -1,81 +1,99 @@
 import { renderHook, act } from '@testing-library/react';
-import { useDebounce } from '../src/hooks/useDebounce';
+import { useDebouncedState } from '../src/hooks/useDebounce';
 
 // Mock timers
 jest.useFakeTimers();
 
-describe('useDebounce Hook', () => {
+describe('useDebouncedState Hook', () => {
   afterEach(() => {
     jest.clearAllTimers();
   });
 
-  test('returns initial value immediately', () => {
-    const { result } = renderHook(() => useDebounce('initial', 500));
-    expect(result.current).toBe('initial');
+  test('returns initial values', () => {
+    const { result } = renderHook(() => useDebouncedState('', 500));
+    const [value, setValue, debouncedValue] = result.current;
+    
+    expect(value).toBe('');
+    expect(debouncedValue).toBe('');
+    expect(typeof setValue).toBe('function');
   });
 
-  test('debounces value updates', () => {
-    const { result, rerender } = renderHook(
-      ({ value, delay }) => useDebounce(value, delay),
-      { initialProps: { value: 'initial', delay: 500 } }
-    );
+  test('updates immediate value instantly but debounces the debounced value', () => {
+    const { result } = renderHook(() => useDebouncedState('', 500));
 
-    expect(result.current).toBe('initial');
+    // Update value
+    act(() => {
+      result.current[1]('hello');
+    });
 
-    // Update the value
-    rerender({ value: 'updated', delay: 500 });
-
-    // Value should not have changed yet
-    expect(result.current).toBe('initial');
+    // Immediate value should update right away
+    expect(result.current[0]).toBe('hello');
+    // Debounced value should still be empty
+    expect(result.current[2]).toBe('');
 
     // Fast forward time
     act(() => {
       jest.advanceTimersByTime(500);
     });
 
-    // Now value should be updated
-    expect(result.current).toBe('updated');
+    // Now debounced value should be updated
+    expect(result.current[2]).toBe('hello');
   });
 
   test('cancels previous timer on rapid updates', () => {
-    const { result, rerender } = renderHook(
-      ({ value, delay }) => useDebounce(value, delay),
-      { initialProps: { value: 'a', delay: 500 } }
-    );
+    const { result } = renderHook(() => useDebouncedState('', 500));
 
     // Rapid updates
-    rerender({ value: 'ab', delay: 500 });
-    act(() => { jest.advanceTimersByTime(200); });
+    act(() => {
+      result.current[1]('a');
+    });
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
     
-    rerender({ value: 'abc', delay: 500 });
-    act(() => { jest.advanceTimersByTime(200); });
+    act(() => {
+      result.current[1]('ab');
+    });
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
     
-    rerender({ value: 'abcd', delay: 500 });
+    act(() => {
+      result.current[1]('abc');
+    });
 
-    // Should still be 'a' as timers keep getting reset
-    expect(result.current).toBe('a');
+    // Immediate value should be 'abc'
+    expect(result.current[0]).toBe('abc');
+    // Debounced value should still be empty (timers keep getting reset)
+    expect(result.current[2]).toBe('');
 
     // Wait for full delay
-    act(() => { jest.advanceTimersByTime(500); });
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
 
-    // Should be final value
-    expect(result.current).toBe('abcd');
+    // Both should now be 'abc'
+    expect(result.current[0]).toBe('abc');
+    expect(result.current[2]).toBe('abc');
   });
 
-  test('uses custom delay', () => {
-    const { result, rerender } = renderHook(
-      ({ value, delay }) => useDebounce(value, delay),
-      { initialProps: { value: 'initial', delay: 1000 } }
-    );
+  test('works with custom delay', () => {
+    const { result } = renderHook(() => useDebouncedState('', 1000));
 
-    rerender({ value: 'updated', delay: 1000 });
+    act(() => {
+      result.current[1]('test');
+    });
 
-    // At 500ms, should still be initial
-    act(() => { jest.advanceTimersByTime(500); });
-    expect(result.current).toBe('initial');
+    // At 500ms, debounced value should still be empty
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+    expect(result.current[2]).toBe('');
 
-    // At 1000ms, should be updated
-    act(() => { jest.advanceTimersByTime(500); });
-    expect(result.current).toBe('updated');
+    // At 1000ms, debounced value should be updated
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+    expect(result.current[2]).toBe('test');
   });
 });
