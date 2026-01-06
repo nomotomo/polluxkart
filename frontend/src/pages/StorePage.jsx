@@ -168,7 +168,7 @@ const StorePage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, selectedBrandId, selectedTypeId, sortBy, searchQuery]);
+  }, [currentPage, selectedBrandId, selectedTypeId, sortBy, searchFilterValue]);
 
   // Load brands from API
   const loadBrands = useCallback(async () => {
@@ -206,7 +206,8 @@ const StorePage = () => {
       setSelectedCategories([category]);
     }
     if (search) {
-      setSearchInput(search);
+      setSearchInputValue(search);
+      setSearchFilterValue(search);
     }
     if (page) {
       setCurrentPage(parseInt(page));
