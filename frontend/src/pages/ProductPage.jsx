@@ -57,6 +57,8 @@ const ProductPage = () => {
     );
   }
 
+  const isOutOfStock = product.inStock === false;
+
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
