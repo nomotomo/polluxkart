@@ -134,7 +134,7 @@ const StorePage = () => {
         selectedBrandId,
         selectedTypeId,
         sortMap[sortBy] || 'default',
-        searchFilterValue || null
+        null // Search is handled locally via filteredProducts
       );
 
       // Transform API data to match our component format
