@@ -177,11 +177,11 @@ const CartPage = () => {
                         {/* Price */}
                         <div className="text-right">
                           <p className="font-heading font-bold text-lg text-foreground">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            ${(item.price * item.quantity))
                           </p>
                           {item.quantity > 1 && (
                             <p className="text-xs text-muted-foreground">
-                              ${item.price.toFixed(2)} each
+                              ${item.price) each
                             </p>
                           )}
                         </div>
@@ -237,12 +237,12 @@ const CartPage = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-medium">${cartTotal.toFixed(2)}</span>
+                    <span className="font-medium">${cartTotal)</span>
                   </div>
                   {discount > 0 && (
                     <div className="flex justify-between text-sm text-success">
                       <span>Discount</span>
-                      <span>-${discount.toFixed(2)}</span>
+                      <span>-${discount)</span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm">
@@ -251,13 +251,13 @@ const CartPage = () => {
                       {shipping === 0 ? (
                         <span className="text-success">Free</span>
                       ) : (
-                        `$${shipping.toFixed(2)}`
+                        `${formatPrice(shipping)`
                       )}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tax (8%)</span>
-                    <span className="font-medium">${tax.toFixed(2)}</span>
+                    <span className="font-medium">${tax)</span>
                   </div>
                 </div>
 
@@ -266,13 +266,13 @@ const CartPage = () => {
                 <div className="flex justify-between">
                   <span className="font-heading font-bold text-lg">Total</span>
                   <span className="font-heading font-bold text-lg text-primary">
-                    ${finalTotal.toFixed(2)}
+                    ${finalTotal)
                   </span>
                 </div>
 
                 {cartTotal < 100 && (
                   <p className="text-xs text-muted-foreground text-center">
-                    Add ${(100 - cartTotal).toFixed(2)} more for free shipping!
+                    Add ${(100 - cartTotal)) more for free shipping!
                   </p>
                 )}
 
