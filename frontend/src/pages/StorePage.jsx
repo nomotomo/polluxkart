@@ -231,19 +231,14 @@ const StorePage = () => {
     loadProducts();
   }, [loadProducts]);
 
-  // Reset page when debounced search query changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
-
   // Filter products locally for mock data (API handles filtering server-side)
   const filteredProducts = useMemo(() => {
     // Always apply local filtering since API might fail and we fall back to mock data
     let result = [...products];
 
-    // Apply search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+    // Apply search filter - use searchFilterValue (the debounced value)
+    if (searchFilterValue) {
+      const query = searchFilterValue.toLowerCase();
       result = result.filter(
         (p) =>
           p.name.toLowerCase().includes(query) ||
