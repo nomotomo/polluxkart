@@ -57,7 +57,27 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test"
+    "test": "craco test",
+    "test:ci": "craco test --coverage --watchAll=false --ci --reporters=default --reporters=jest-junit",
+    "lint": "eslint src/ tests/"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/src",
+      "<rootDir>/tests"
+    ],
+    "testMatch": [
+      "<rootDir>/tests/**/*.test.{js,jsx}",
+      "<rootDir>/src/**/*.test.{js,jsx}"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupTests.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!src/index.js",
+      "!src/reportWebVitals.js"
+    ]
   },
   "browserslist": {
     "production": [
