@@ -38,21 +38,34 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Run unit tests
-        run: yarn test --coverage --watchAll=false --ci
+      - name: Run unit tests with coverage
+        run: yarn test:ci
         env:
           CI: true
+          JEST_JUNIT_OUTPUT_DIR: ./reports
+          JEST_JUNIT_OUTPUT_NAME: junit.xml
 
-      - name: Build application
-        run: yarn build
-
-      - name: Upload coverage report
+      - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: coverage-report
-          path: frontend/coverage/
+          name: test-results
+          path: |
+            frontend/reports/junit.xml
+            frontend/coverage/
           retention-days: 7
+
+      - name: Test Report Summary
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Jest Tests
+          path: frontend/reports/junit.xml
+          reporter: jest-junit
+          fail-on-error: true
+
+      - name: Build application
+        run: yarn build
 
   lint:
     runs-on: ubuntu-latest
@@ -86,4 +99,5 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Run ESLint
-        run: npx eslint src/ --ext .js,.jsx --max-warnings 0 || true
+        run: yarn lint --format stylish
+        continue-on-error: true
