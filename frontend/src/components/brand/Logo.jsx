@@ -12,65 +12,55 @@ const Logo = ({ size = 'default', showText = true, className = '' }) => {
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      {/* Logo Icon - Star + Cart fusion */}
+      {/* Logo Icon - Shopping bag with PK initials */}
       <svg
         width={iconSize}
         height={iconSize}
-        viewBox="0 0 48 48"
+        viewBox="0 0 64 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="shrink-0"
       >
-        {/* Background shape */}
-        <rect
-          x="2"
-          y="2"
-          width="44"
-          height="44"
-          rx="12"
-          fill="url(#logoGradient)"
-        />
-        
-        {/* Star shape - representing Pollux star */}
-        <path
-          d="M24 8L26.5 18.5H37L28.5 25L31 36L24 29L17 36L19.5 25L11 18.5H21.5L24 8Z"
-          fill="white"
-          fillOpacity="0.9"
-        />
-        
-        {/* Shopping cart accent */}
-        <circle cx="19" cy="38" r="2.5" fill="white" fillOpacity="0.8" />
-        <circle cx="29" cy="38" r="2.5" fill="white" fillOpacity="0.8" />
-        
-        {/* Accent sparkle */}
-        <circle cx="36" cy="12" r="3" fill="url(#accentGradient)" />
-        <circle cx="38" cy="10" r="1.5" fill="white" fillOpacity="0.9" />
-
-        {/* Gradients */}
         <defs>
-          <linearGradient
-            id="logoGradient"
-            x1="2"
-            y1="2"
-            x2="46"
-            y2="46"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stopColor="hsl(174, 72%, 45%)" />
-            <stop offset="1" stopColor="hsl(174, 72%, 35%)" />
+          <linearGradient id="bgGradLogo" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="hsl(174, 72%, 40%)" />
+            <stop offset="100%" stopColor="hsl(174, 72%, 32%)" />
           </linearGradient>
-          <linearGradient
-            id="accentGradient"
-            x1="33"
-            y1="9"
-            x2="39"
-            y2="15"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stopColor="hsl(90, 60%, 55%)" />
-            <stop offset="1" stopColor="hsl(90, 60%, 45%)" />
+          <linearGradient id="bagGradLogo" x1="20" y1="8" x2="44" y2="48" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#FFFFFF" />
+            <stop offset="100%" stopColor="#F0FDFA" />
+          </linearGradient>
+          <linearGradient id="accentGradLogo" x1="44" y1="8" x2="56" y2="20" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="hsl(90, 60%, 55%)" />
+            <stop offset="100%" stopColor="hsl(90, 60%, 45%)" />
           </linearGradient>
         </defs>
+        
+        {/* Background */}
+        <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bgGradLogo)" />
+        
+        {/* Shopping bag top */}
+        <path d="M22 18C22 14.6863 24.6863 12 28 12H36C39.3137 12 42 14.6863 42 18V20H22V18Z" fill="url(#bagGradLogo)" fillOpacity="0.9" />
+        
+        {/* Shopping bag body */}
+        <rect x="20" y="20" width="24" height="30" rx="3" fill="url(#bagGradLogo)" fillOpacity="0.95" />
+        
+        {/* Bag handle */}
+        <path d="M26 16V12C26 10.8954 26.8954 10 28 10H36C37.1046 10 38 10.8954 38 12V16" stroke="url(#bagGradLogo)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+        
+        {/* K design inside */}
+        <path d="M28 28V42M28 35L36 28M32 35L36 42" stroke="hsl(174, 72%, 35%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        
+        {/* Star sparkle */}
+        <circle cx="50" cy="14" r="6" fill="url(#accentGradLogo)" />
+        <path d="M50 10L51 13H54L51.5 15L52.5 18L50 16L47.5 18L48.5 15L46 13H49L50 10Z" fill="white" fillOpacity="0.95" />
+        
+        {/* Cart wheels */}
+        <circle cx="26" cy="52" r="3" fill="white" fillOpacity="0.85" />
+        <circle cx="38" cy="52" r="3" fill="white" fillOpacity="0.85" />
+        
+        {/* Small sparkles */}
+        <circle cx="48" cy="26" r="1.5" fill="url(#accentGradLogo)" fillOpacity="0.8" />
       </svg>
 
       {/* Logo Text */}
@@ -89,52 +79,35 @@ export const LogoIcon = ({ size = 32, className = '' }) => (
   <svg
     width={size}
     height={size}
-    viewBox="0 0 48 48"
+    viewBox="0 0 64 64"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={className}
   >
-    <rect
-      x="2"
-      y="2"
-      width="44"
-      height="44"
-      rx="12"
-      fill="url(#logoGradientIcon)"
-    />
-    <path
-      d="M24 8L26.5 18.5H37L28.5 25L31 36L24 29L17 36L19.5 25L11 18.5H21.5L24 8Z"
-      fill="white"
-      fillOpacity="0.9"
-    />
-    <circle cx="19" cy="38" r="2.5" fill="white" fillOpacity="0.8" />
-    <circle cx="29" cy="38" r="2.5" fill="white" fillOpacity="0.8" />
-    <circle cx="36" cy="12" r="3" fill="url(#accentGradientIcon)" />
-    <circle cx="38" cy="10" r="1.5" fill="white" fillOpacity="0.9" />
     <defs>
-      <linearGradient
-        id="logoGradientIcon"
-        x1="2"
-        y1="2"
-        x2="46"
-        y2="46"
-        gradientUnits="userSpaceOnUse"
-      >
-        <stop stopColor="#20B2AA" />
-        <stop offset="1" stopColor="#178F89" />
+      <linearGradient id="bgGradIcon" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#14B8A6" />
+        <stop offset="100%" stopColor="#0D9488" />
       </linearGradient>
-      <linearGradient
-        id="accentGradientIcon"
-        x1="33"
-        y1="9"
-        x2="39"
-        y2="15"
-        gradientUnits="userSpaceOnUse"
-      >
-        <stop stopColor="#84CC16" />
-        <stop offset="1" stopColor="#65A30D" />
+      <linearGradient id="bagGradIcon" x1="20" y1="8" x2="44" y2="48" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#FFFFFF" />
+        <stop offset="100%" stopColor="#F0FDFA" />
+      </linearGradient>
+      <linearGradient id="accentGradIcon" x1="44" y1="8" x2="56" y2="20" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#A3E635" />
+        <stop offset="100%" stopColor="#84CC16" />
       </linearGradient>
     </defs>
+    
+    <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bgGradIcon)" />
+    <path d="M22 18C22 14.6863 24.6863 12 28 12H36C39.3137 12 42 14.6863 42 18V20H22V18Z" fill="url(#bagGradIcon)" fillOpacity="0.9" />
+    <rect x="20" y="20" width="24" height="30" rx="3" fill="url(#bagGradIcon)" fillOpacity="0.95" />
+    <path d="M26 16V12C26 10.8954 26.8954 10 28 10H36C37.1046 10 38 10.8954 38 12V16" stroke="url(#bagGradIcon)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    <path d="M28 28V42M28 35L36 28M32 35L36 42" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="50" cy="14" r="6" fill="url(#accentGradIcon)" />
+    <path d="M50 10L51 13H54L51.5 15L52.5 18L50 16L47.5 18L48.5 15L46 13H49L50 10Z" fill="white" fillOpacity="0.95" />
+    <circle cx="26" cy="52" r="3" fill="white" fillOpacity="0.85" />
+    <circle cx="38" cy="52" r="3" fill="white" fillOpacity="0.85" />
   </svg>
 );
 
