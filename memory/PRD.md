@@ -88,6 +88,7 @@ Build a frontend prototype for an e-commerce store named "PolluxKart" with a tec
 ## Known Mocked Elements
 - **Backend API**: All API calls fallback to local mock data
 - **Authentication**: Mocked - any credentials work
+- **OTP Verification**: MOCKED - Test OTP is 123456, but any 6-digit code works
 - **Payment**: UI only - no real transactions
 - **Orders**: Stored in localStorage, not persistent
 
