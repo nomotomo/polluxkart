@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, Phone, ChevronDown } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, Phone, ChevronDown, Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -21,13 +21,31 @@ import { toast } from 'sonner';
 import Logo from '../components/brand/Logo';
 import { countryCodes, getCountryByCode } from '../data/countryCodes';
 
+// Mock OTP verification - In production, this would call a real API
+const MOCK_OTP = '123456'; // For testing purposes
+
 const AuthPage = () => {
   const navigate = useNavigate();
   const { login, signup, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
+  const [loginMethod, setLoginMethod] = useState('email');
   const [loginCountryCode, setLoginCountryCode] = useState('+91');
   const [signupCountryCode, setSignupCountryCode] = useState('+91');
+  
+  // OTP States
+  const [loginOtpSent, setLoginOtpSent] = useState(false);
+  const [loginOtpVerified, setLoginOtpVerified] = useState(false);
+  const [loginOtp, setLoginOtp] = useState(['', '', '', '', '', '']);
+  const [signupOtpSent, setSignupOtpSent] = useState(false);
+  const [signupOtpVerified, setSignupOtpVerified] = useState(false);
+  const [signupOtp, setSignupOtp] = useState(['', '', '', '', '', '']);
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [otpTimer, setOtpTimer] = useState(0);
+  
+  // OTP input refs
+  const loginOtpRefs = useRef([]);
+  const signupOtpRefs = useRef([]);
   
   const [loginData, setLoginData] = useState({ 
     email: '', 
@@ -46,8 +64,118 @@ const AuthPage = () => {
   const loginCountry = getCountryByCode(loginCountryCode);
   const signupCountry = getCountryByCode(signupCountryCode);
 
+  // OTP Timer countdown
+  useEffect(() => {
+    if (otpTimer > 0) {
+      const timer = setTimeout(() => setOtpTimer(otpTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [otpTimer]);
+
+  // Handle OTP input change
+  const handleOtpChange = (index, value, otpArray, setOtpArray, refs) => {
+    if (value.length > 1) {
+      value = value.slice(-1);
+    }
+    if (!/^\d*$/.test(value)) return;
+
+    const newOtp = [...otpArray];
+    newOtp[index] = value;
+    setOtpArray(newOtp);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      refs.current[index + 1]?.focus();
+    }
+  };
+
+  // Handle OTP paste
+  const handleOtpPaste = (e, setOtpArray, refs) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').slice(0, 6);
+    if (!/^\d+$/.test(pastedData)) return;
+
+    const newOtp = pastedData.split('').concat(Array(6 - pastedData.length).fill(''));
+    setOtpArray(newOtp.slice(0, 6));
+    refs.current[Math.min(pastedData.length, 5)]?.focus();
+  };
+
+  // Handle OTP backspace
+  const handleOtpKeyDown = (index, e, otpArray, setOtpArray, refs) => {
+    if (e.key === 'Backspace' && !otpArray[index] && index > 0) {
+      refs.current[index - 1]?.focus();
+    }
+  };
+
+  // Send OTP (Mock)
+  const sendOtp = async (phone, isLogin = true) => {
+    if (!phone || phone.length < 7) {
+      toast.error('Please enter a valid phone number');
+      return;
+    }
+
+    setSendingOtp(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    if (isLogin) {
+      setLoginOtpSent(true);
+      setLoginOtp(['', '', '', '', '', '']);
+      setLoginOtpVerified(false);
+    } else {
+      setSignupOtpSent(true);
+      setSignupOtp(['', '', '', '', '', '']);
+      setSignupOtpVerified(false);
+    }
+    
+    setOtpTimer(30);
+    setSendingOtp(false);
+    toast.success(`OTP sent to ${isLogin ? loginCountryCode : signupCountryCode}${phone}`, {
+      description: `For testing, use: ${MOCK_OTP}`,
+    });
+  };
+
+  // Verify OTP (Mock)
+  const verifyOtp = async (otp, isLogin = true) => {
+    const otpString = otp.join('');
+    if (otpString.length !== 6) {
+      toast.error('Please enter complete 6-digit OTP');
+      return false;
+    }
+
+    setVerifyingOtp(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Mock verification - accept MOCK_OTP or any 6-digit code
+    if (otpString === MOCK_OTP || otpString.length === 6) {
+      if (isLogin) {
+        setLoginOtpVerified(true);
+      } else {
+        setSignupOtpVerified(true);
+      }
+      setVerifyingOtp(false);
+      toast.success('Phone number verified!');
+      return true;
+    } else {
+      setVerifyingOtp(false);
+      toast.error('Invalid OTP. Please try again.');
+      return false;
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
+    
+    if (loginMethod === 'phone') {
+      if (!loginOtpVerified) {
+        toast.error('Please verify your phone number first');
+        return;
+      }
+    }
+    
     const identifier = loginMethod === 'email' ? loginData.email : `${loginCountryCode}${loginData.phone}`;
     
     if (!loginData.email && loginMethod === 'email') {
@@ -63,15 +191,6 @@ const AuthPage = () => {
     if (!loginData.password) {
       toast.error('Please enter your password');
       return;
-    }
-    
-    // Validate phone number format based on country
-    if (loginMethod === 'phone') {
-      const phoneDigits = loginData.phone.replace(/\D/g, '');
-      if (phoneDigits.length < 7 || phoneDigits.length > loginCountry.maxLength) {
-        toast.error(`Please enter a valid phone number (${loginCountry.maxLength} digits for ${loginCountry.country})`);
-        return;
-      }
     }
     
     try {
@@ -91,10 +210,8 @@ const AuthPage = () => {
       return;
     }
     
-    // Validate phone number based on country
-    const phoneDigits = signupData.phone.replace(/\D/g, '');
-    if (phoneDigits.length < 7 || phoneDigits.length > signupCountry.maxLength) {
-      toast.error(`Please enter a valid phone number (${signupCountry.maxLength} digits for ${signupCountry.country})`);
+    if (!signupOtpVerified) {
+      toast.error('Please verify your phone number first');
       return;
     }
     
@@ -129,6 +246,27 @@ const AuthPage = () => {
     }
   };
 
+  // Reset OTP state when phone number changes
+  const handleLoginPhoneChange = (value) => {
+    const cleaned = value.replace(/\D/g, '').slice(0, loginCountry.maxLength);
+    setLoginData({ ...loginData, phone: cleaned });
+    if (loginOtpSent) {
+      setLoginOtpSent(false);
+      setLoginOtpVerified(false);
+      setLoginOtp(['', '', '', '', '', '']);
+    }
+  };
+
+  const handleSignupPhoneChange = (value) => {
+    const cleaned = value.replace(/\D/g, '').slice(0, signupCountry.maxLength);
+    setSignupData({ ...signupData, phone: cleaned });
+    if (signupOtpSent) {
+      setSignupOtpSent(false);
+      setSignupOtpVerified(false);
+      setSignupOtp(['', '', '', '', '', '']);
+    }
+  };
+
   const CountryCodeSelector = ({ value, onChange, id }) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -158,6 +296,28 @@ const AuthPage = () => {
         </ScrollArea>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+
+  // OTP Input Component
+  const OtpInput = ({ otp, setOtp, refs, disabled = false }) => (
+    <div className="flex gap-2 justify-center">
+      {otp.map((digit, index) => (
+        <Input
+          key={index}
+          ref={(el) => (refs.current[index] = el)}
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={digit}
+          onChange={(e) => handleOtpChange(index, e.target.value, otp, setOtp, refs)}
+          onKeyDown={(e) => handleOtpKeyDown(index, e, otp, setOtp, refs)}
+          onPaste={(e) => handleOtpPaste(e, setOtp, refs)}
+          disabled={disabled}
+          className="w-10 h-12 text-center text-lg font-semibold"
+          data-testid={`otp-input-${index}`}
+        />
+      ))}
+    </div>
   );
 
   return (
@@ -226,7 +386,11 @@ const AuthPage = () => {
                         <Label>Login with</Label>
                         <RadioGroup
                           value={loginMethod}
-                          onValueChange={setLoginMethod}
+                          onValueChange={(value) => {
+                            setLoginMethod(value);
+                            setLoginOtpSent(false);
+                            setLoginOtpVerified(false);
+                          }}
                           className="flex gap-4"
                         >
                           <div className="flex items-center space-x-2">
@@ -264,7 +428,7 @@ const AuthPage = () => {
                           </div>
                         </div>
                       ) : (
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           <Label htmlFor="login-phone">Phone Number</Label>
                           <div className="flex">
                             <CountryCodeSelector
@@ -277,14 +441,93 @@ const AuthPage = () => {
                               type="tel"
                               placeholder="Enter your phone number"
                               value={loginData.phone}
-                              onChange={(e) =>
-                                setLoginData({ ...loginData, phone: e.target.value.replace(/\D/g, '').slice(0, loginCountry.maxLength) })
-                              }
+                              onChange={(e) => handleLoginPhoneChange(e.target.value)}
                               className="rounded-l-none"
                               maxLength={loginCountry.maxLength}
                               data-testid="login-phone-input"
+                              disabled={loginOtpVerified}
                             />
                           </div>
+                          
+                          {/* OTP Section for Login */}
+                          {!loginOtpVerified && (
+                            <div className="space-y-3">
+                              {!loginOtpSent ? (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  className="w-full"
+                                  onClick={() => sendOtp(loginData.phone, true)}
+                                  disabled={sendingOtp || loginData.phone.length < 7}
+                                  data-testid="login-send-otp-btn"
+                                >
+                                  {sendingOtp ? (
+                                    <>
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                      Sending OTP...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Phone className="mr-2 h-4 w-4" />
+                                      Send OTP
+                                    </>
+                                  )}
+                                </Button>
+                              ) : (
+                                <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                                  <p className="text-sm text-center text-muted-foreground">
+                                    Enter 6-digit OTP sent to {loginCountryCode}{loginData.phone}
+                                  </p>
+                                  <OtpInput
+                                    otp={loginOtp}
+                                    setOtp={setLoginOtp}
+                                    refs={loginOtpRefs}
+                                    disabled={verifyingOtp}
+                                  />
+                                  <Button
+                                    type="button"
+                                    className="w-full"
+                                    onClick={() => verifyOtp(loginOtp, true)}
+                                    disabled={verifyingOtp || loginOtp.join('').length !== 6}
+                                    data-testid="login-verify-otp-btn"
+                                  >
+                                    {verifyingOtp ? (
+                                      <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Verifying...
+                                      </>
+                                    ) : (
+                                      'Verify OTP'
+                                    )}
+                                  </Button>
+                                  <div className="text-center">
+                                    {otpTimer > 0 ? (
+                                      <p className="text-sm text-muted-foreground">
+                                        Resend OTP in {otpTimer}s
+                                      </p>
+                                    ) : (
+                                      <Button
+                                        type="button"
+                                        variant="link"
+                                        className="text-sm p-0 h-auto"
+                                        onClick={() => sendOtp(loginData.phone, true)}
+                                        disabled={sendingOtp}
+                                      >
+                                        Resend OTP
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          {loginOtpVerified && (
+                            <div className="flex items-center gap-2 text-success text-sm">
+                              <CheckCircle2 className="h-4 w-4" />
+                              Phone number verified
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -328,7 +571,7 @@ const AuthPage = () => {
                       <Button
                         type="submit"
                         className="w-full bg-primary hover:bg-primary-dark"
-                        disabled={isLoading}
+                        disabled={isLoading || (loginMethod === 'phone' && !loginOtpVerified)}
                         data-testid="login-submit-btn"
                       >
                         {isLoading ? 'Logging in...' : 'Login'}
@@ -390,7 +633,7 @@ const AuthPage = () => {
                         </div>
                       </div>
 
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <Label htmlFor="signup-phone">Phone Number <span className="text-destructive">*</span></Label>
                         <div className="flex">
                           <CountryCodeSelector
@@ -403,15 +646,93 @@ const AuthPage = () => {
                             type="tel"
                             placeholder="Enter your phone number"
                             value={signupData.phone}
-                            onChange={(e) =>
-                              setSignupData({ ...signupData, phone: e.target.value.replace(/\D/g, '').slice(0, signupCountry.maxLength) })
-                            }
+                            onChange={(e) => handleSignupPhoneChange(e.target.value)}
                             className="rounded-l-none"
                             maxLength={signupCountry.maxLength}
                             data-testid="signup-phone-input"
+                            disabled={signupOtpVerified}
                           />
                         </div>
-                        <p className="text-xs text-muted-foreground">We'll send OTP for verification</p>
+                        
+                        {/* OTP Section for Signup */}
+                        {!signupOtpVerified && (
+                          <div className="space-y-3">
+                            {!signupOtpSent ? (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => sendOtp(signupData.phone, false)}
+                                disabled={sendingOtp || signupData.phone.length < 7}
+                                data-testid="signup-send-otp-btn"
+                              >
+                                {sendingOtp ? (
+                                  <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Sending OTP...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Phone className="mr-2 h-4 w-4" />
+                                    Verify Phone Number
+                                  </>
+                                )}
+                              </Button>
+                            ) : (
+                              <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                                <p className="text-sm text-center text-muted-foreground">
+                                  Enter 6-digit OTP sent to {signupCountryCode}{signupData.phone}
+                                </p>
+                                <OtpInput
+                                  otp={signupOtp}
+                                  setOtp={setSignupOtp}
+                                  refs={signupOtpRefs}
+                                  disabled={verifyingOtp}
+                                />
+                                <Button
+                                  type="button"
+                                  className="w-full"
+                                  onClick={() => verifyOtp(signupOtp, false)}
+                                  disabled={verifyingOtp || signupOtp.join('').length !== 6}
+                                  data-testid="signup-verify-otp-btn"
+                                >
+                                  {verifyingOtp ? (
+                                    <>
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                      Verifying...
+                                    </>
+                                  ) : (
+                                    'Verify OTP'
+                                  )}
+                                </Button>
+                                <div className="text-center">
+                                  {otpTimer > 0 ? (
+                                    <p className="text-sm text-muted-foreground">
+                                      Resend OTP in {otpTimer}s
+                                    </p>
+                                  ) : (
+                                    <Button
+                                      type="button"
+                                      variant="link"
+                                      className="text-sm p-0 h-auto"
+                                      onClick={() => sendOtp(signupData.phone, false)}
+                                      disabled={sendingOtp}
+                                    >
+                                      Resend OTP
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        
+                        {signupOtpVerified && (
+                          <div className="flex items-center gap-2 text-success text-sm">
+                            <CheckCircle2 className="h-4 w-4" />
+                            Phone number verified
+                          </div>
+                        )}
                       </div>
 
                       <div className="space-y-2">
@@ -507,7 +828,7 @@ const AuthPage = () => {
                       <Button
                         type="submit"
                         className="w-full bg-primary hover:bg-primary-dark"
-                        disabled={isLoading}
+                        disabled={isLoading || !signupOtpVerified}
                         data-testid="signup-submit-btn"
                       >
                         {isLoading ? 'Creating account...' : 'Create Account'}
