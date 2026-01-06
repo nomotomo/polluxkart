@@ -298,23 +298,29 @@ const AuthPage = () => {
     </DropdownMenu>
   );
 
-  // OTP Input Component
-  const OtpInput = ({ otp, setOtp, refs, disabled = false }) => (
+  // OTP Input Component - render inline to preserve refs
+  const renderOtpInputs = (otp, setOtp, refs, disabled = false, prefix = 'otp') => (
     <div className="flex gap-2 justify-center">
-      {otp.map((digit, index) => (
-        <Input
+      {[0, 1, 2, 3, 4, 5].map((index) => (
+        <input
           key={index}
-          ref={(el) => (refs.current[index] = el)}
+          ref={(el) => {
+            if (refs.current) {
+              refs.current[index] = el;
+            }
+          }}
           type="text"
           inputMode="numeric"
+          pattern="[0-9]*"
           maxLength={1}
-          value={digit}
+          value={otp[index] || ''}
           onChange={(e) => handleOtpChange(index, e.target.value, otp, setOtp, refs)}
           onKeyDown={(e) => handleOtpKeyDown(index, e, otp, setOtp, refs)}
           onPaste={(e) => handleOtpPaste(e, setOtp, refs)}
           disabled={disabled}
-          className="w-10 h-12 text-center text-lg font-semibold"
-          data-testid={`otp-input-${index}`}
+          className="w-10 h-12 text-center text-lg font-semibold border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50"
+          data-testid={`${prefix}-input-${index}`}
+          autoComplete="one-time-code"
         />
       ))}
     </div>
