@@ -25,29 +25,33 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  const login = async (email, password) => {
+  const login = async (identifier, password, method = 'email') => {
     setIsLoading(true);
     // Mock login - simulating API call
     await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const isEmail = method === 'email';
     const mockUser = {
       id: '1',
-      name: email.split('@')[0],
-      email,
-      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${email}`,
+      name: isEmail ? identifier.split('@')[0] : `User${identifier.slice(-4)}`,
+      email: isEmail ? identifier : null,
+      phone: isEmail ? null : identifier,
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${identifier}`,
     };
     setUser(mockUser);
     setIsLoading(false);
     return mockUser;
   };
 
-  const signup = async (name, email, password) => {
+  const signup = async (name, email, phone, password) => {
     setIsLoading(true);
     // Mock signup - simulating API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     const mockUser = {
       id: Date.now().toString(),
       name,
-      email,
+      email: email || null,
+      phone,
       avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${name}`,
     };
     setUser(mockUser);
