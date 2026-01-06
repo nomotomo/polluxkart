@@ -70,9 +70,6 @@
       "<rootDir>/tests/**/*.test.{js,jsx}",
       "<rootDir>/src/**/*.test.{js,jsx}"
     ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/src/setupTests.js"
-    ],
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}",
       "!src/index.js",
