@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, Phone } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Checkbox } from '../components/ui/checkbox';
 import { Separator } from '../components/ui/separator';
+import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 import Logo from '../components/brand/Logo';
@@ -16,11 +17,17 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const { login, signup, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
   
-  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [loginData, setLoginData] = useState({ 
+    email: '', 
+    phone: '',
+    password: '' 
+  });
   const [signupData, setSignupData] = useState({
     name: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
     agreeTerms: false,
@@ -28,12 +35,21 @@ const AuthPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!loginData.email || !loginData.password) {
+    const identifier = loginMethod === 'email' ? loginData.email : loginData.phone;
+    
+    if (!identifier || !loginData.password) {
       toast.error('Please fill in all fields');
       return;
     }
+    
+    // Validate phone number format
+    if (loginMethod === 'phone' && !/^[6-9]\d{9}$/.test(loginData.phone)) {
+      toast.error('Please enter a valid 10-digit mobile number');
+      return;
+    }
+    
     try {
-      await login(loginData.email, loginData.password);
+      await login(identifier, loginData.password, loginMethod);
       toast.success('Welcome back!');
       navigate('/');
     } catch (error) {
@@ -43,20 +59,41 @@ const AuthPage = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    if (!signupData.name || !signupData.email || !signupData.password) {
-      toast.error('Please fill in all fields');
+    
+    if (!signupData.name || !signupData.phone || !signupData.password) {
+      toast.error('Please fill in all required fields');
       return;
     }
+    
+    // Validate phone number
+    if (!/^[6-9]\d{9}$/.test(signupData.phone)) {
+      toast.error('Please enter a valid 10-digit mobile number');
+      return;
+    }
+    
+    // Validate email if provided
+    if (signupData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupData.email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    
     if (signupData.password !== signupData.confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
+    
+    if (signupData.password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    
     if (!signupData.agreeTerms) {
       toast.error('Please agree to the terms and conditions');
       return;
     }
+    
     try {
-      await signup(signupData.name, signupData.email, signupData.password);
+      await signup(signupData.name, signupData.email, signupData.phone, signupData.password);
       toast.success('Account created successfully!');
       navigate('/');
     } catch (error) {
@@ -114,33 +151,82 @@ const AuthPage = () => {
           <div className="w-full max-w-md">
             <Card className="border-0 shadow-xl">
               <Tabs defaultValue="login" className="w-full">
-                <CardHeader className="pb-0">
+                <div className="px-6 pt-6">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="login">Login</TabsTrigger>
                     <TabsTrigger value="signup">Sign Up</TabsTrigger>
                   </TabsList>
-                </CardHeader>
+                </div>
 
                 <CardContent className="pt-6">
                   {/* Login Tab */}
                   <TabsContent value="login" className="mt-0">
                     <form onSubmit={handleLogin} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="login-email">Email</Label>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="login-email"
-                            type="email"
-                            placeholder="Enter your email"
-                            value={loginData.email}
-                            onChange={(e) =>
-                              setLoginData({ ...loginData, email: e.target.value })
-                            }
-                            className="pl-10"
-                          />
-                        </div>
+                      {/* Login Method Selection */}
+                      <div className="space-y-3">
+                        <Label>Login with</Label>
+                        <RadioGroup
+                          value={loginMethod}
+                          onValueChange={setLoginMethod}
+                          className="flex gap-4"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="email" id="login-email-method" />
+                            <Label htmlFor="login-email-method" className="font-normal cursor-pointer">
+                              Email
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="phone" id="login-phone-method" />
+                            <Label htmlFor="login-phone-method" className="font-normal cursor-pointer">
+                              Phone
+                            </Label>
+                          </div>
+                        </RadioGroup>
                       </div>
+
+                      {/* Email/Phone Input */}
+                      {loginMethod === 'email' ? (
+                        <div className="space-y-2">
+                          <Label htmlFor="login-email">Email</Label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="login-email"
+                              type="email"
+                              placeholder="Enter your email"
+                              value={loginData.email}
+                              onChange={(e) =>
+                                setLoginData({ ...loginData, email: e.target.value })
+                              }
+                              className="pl-10"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <Label htmlFor="login-phone">Phone Number</Label>
+                          <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <div className="flex">
+                              <div className="flex items-center px-3 border border-r-0 rounded-l-md bg-muted text-sm text-muted-foreground">
+                                +91
+                              </div>
+                              <Input
+                                id="login-phone"
+                                type="tel"
+                                placeholder="Enter your phone number"
+                                value={loginData.phone}
+                                onChange={(e) =>
+                                  setLoginData({ ...loginData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })
+                                }
+                                className="rounded-l-none"
+                                maxLength={10}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
@@ -225,13 +311,13 @@ const AuthPage = () => {
                   <TabsContent value="signup" className="mt-0">
                     <form onSubmit={handleSignup} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="signup-name">Full Name</Label>
+                        <Label htmlFor="signup-name">Full Name <span className="text-destructive">*</span></Label>
                         <div className="relative">
                           <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
                             id="signup-name"
                             type="text"
-                            placeholder="Enter your name"
+                            placeholder="Enter your full name"
                             value={signupData.name}
                             onChange={(e) =>
                               setSignupData({ ...signupData, name: e.target.value })
@@ -242,13 +328,36 @@ const AuthPage = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="signup-email">Email</Label>
+                        <Label htmlFor="signup-phone">Phone Number <span className="text-destructive">*</span></Label>
+                        <div className="relative">
+                          <div className="flex">
+                            <div className="flex items-center px-3 border border-r-0 rounded-l-md bg-muted text-sm text-muted-foreground">
+                              +91
+                            </div>
+                            <Input
+                              id="signup-phone"
+                              type="tel"
+                              placeholder="Enter your phone number"
+                              value={signupData.phone}
+                              onChange={(e) =>
+                                setSignupData({ ...signupData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })
+                              }
+                              className="rounded-l-none"
+                              maxLength={10}
+                            />
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground">We'll send OTP for verification</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-email">Email <span className="text-muted-foreground text-xs">(Optional)</span></Label>
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
                             id="signup-email"
                             type="email"
-                            placeholder="Enter your email"
+                            placeholder="Enter your email (optional)"
                             value={signupData.email}
                             onChange={(e) =>
                               setSignupData({ ...signupData, email: e.target.value })
@@ -259,7 +368,7 @@ const AuthPage = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="signup-password">Password</Label>
+                        <Label htmlFor="signup-password">Password <span className="text-destructive">*</span></Label>
                         <div className="relative">
                           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
@@ -284,10 +393,11 @@ const AuthPage = () => {
                             )}
                           </button>
                         </div>
+                        <p className="text-xs text-muted-foreground">Minimum 6 characters</p>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="confirm-password">Confirm Password</Label>
+                        <Label htmlFor="confirm-password">Confirm Password <span className="text-destructive">*</span></Label>
                         <div className="relative">
                           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
