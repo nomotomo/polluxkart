@@ -50,8 +50,15 @@ Build a frontend prototype for an e-commerce store named "PolluxKart" with a tec
 3. **Categories Navigation**: Full dropdown in header with subcategories
 4. **Out-of-Stock Handling**: Disabled buttons and indicator on ProductPage
 5. **Wishlist Integration**: Working add/remove on ProductPage
-6. **Unit Tests**: 24 tests covering currency, products, country codes
-7. **GitHub Actions CI**: Runs tests, lint, build on PR to main/dev
+6. **OTP Verification (MOCKED)**: Phone verification flow with:
+   - Send OTP button
+   - 6-digit OTP input boxes
+   - Verify OTP button
+   - Resend timer (30s countdown)
+   - Mock OTP: 123456 (any 6-digit code works)
+7. **Debounced Search**: Store search waits 500ms before filtering (prevents search on every keystroke)
+8. **Unit Tests**: 28 tests covering currency, products, country codes, debounce hook
+9. **GitHub Actions CI**: Runs tests, lint, build on PR to main/dev
 
 ## File Structure
 ```
