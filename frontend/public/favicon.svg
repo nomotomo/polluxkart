@@ -1,18 +1,52 @@
-<svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#faviconGradient)"/>
-  <path d="M24 8L26.5 18.5H37L28.5 25L31 36L24 29L17 36L19.5 25L11 18.5H21.5L24 8Z" fill="white" fill-opacity="0.9"/>
-  <circle cx="19" cy="38" r="2.5" fill="white" fill-opacity="0.8"/>
-  <circle cx="29" cy="38" r="2.5" fill="white" fill-opacity="0.8"/>
-  <circle cx="36" cy="12" r="3" fill="url(#faviconAccent)"/>
-  <circle cx="38" cy="10" r="1.5" fill="white" fill-opacity="0.9"/>
+<svg width="32" height="32" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main background with gradient -->
   <defs>
-    <linearGradient id="faviconGradient" x1="2" y1="2" x2="46" y2="46" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#20B2AA"/>
-      <stop offset="1" stop-color="#178F89"/>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#14B8A6"/>
+      <stop offset="100%" stop-color="#0D9488"/>
     </linearGradient>
-    <linearGradient id="faviconAccent" x1="33" y1="9" x2="39" y2="15" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#84CC16"/>
-      <stop offset="1" stop-color="#65A30D"/>
+    <linearGradient id="starGrad" x1="20" y1="8" x2="44" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F0FDFA"/>
     </linearGradient>
+    <linearGradient id="accentGrad" x1="44" y1="8" x2="56" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#A3E635"/>
+      <stop offset="100%" stop-color="#84CC16"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
+  
+  <!-- Rounded square background -->
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bgGrad)"/>
+  
+  <!-- Inner subtle border -->
+  <rect x="6" y="6" width="52" height="52" rx="12" fill="none" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+  
+  <!-- Main "P" letter stylized as shopping bag -->
+  <path d="M22 18C22 14.6863 24.6863 12 28 12H36C39.3137 12 42 14.6863 42 18V20H22V18Z" fill="url(#starGrad)" fill-opacity="0.9"/>
+  <rect x="20" y="20" width="24" height="30" rx="3" fill="url(#starGrad)" fill-opacity="0.95"/>
+  
+  <!-- Handle of bag -->
+  <path d="M26 16V12C26 10.8954 26.8954 10 28 10H36C37.1046 10 38 10.8954 38 12V16" stroke="url(#starGrad)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  
+  <!-- "K" accent mark inside bag -->
+  <path d="M28 28V42M28 35L36 28M32 35L36 42" stroke="#0D9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Sparkle/star accent -->
+  <circle cx="50" cy="14" r="6" fill="url(#accentGrad)" filter="url(#glow)"/>
+  <path d="M50 10L51 13H54L51.5 15L52.5 18L50 16L47.5 18L48.5 15L46 13H49L50 10Z" fill="white" fill-opacity="0.95"/>
+  
+  <!-- Small cart wheels -->
+  <circle cx="26" cy="52" r="3" fill="white" fill-opacity="0.85"/>
+  <circle cx="38" cy="52" r="3" fill="white" fill-opacity="0.85"/>
+  
+  <!-- Tiny sparkles -->
+  <circle cx="48" cy="26" r="1.5" fill="url(#accentGrad)" fill-opacity="0.8"/>
+  <circle cx="52" cy="22" r="1" fill="white" fill-opacity="0.6"/>
 </svg>
