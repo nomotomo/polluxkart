@@ -84,8 +84,8 @@ Collections:
 
 ### Admin (require admin role)
 - `GET /api/admin/dashboard` - Dashboard stats
-- `POST /api/admin/upload` - Upload image
-- `POST /api/admin/upload/multiple` - Upload multiple images
+- `POST /api/admin/upload` - Upload image (local fallback)
+- `POST /api/admin/upload/multiple` - Upload multiple images (local fallback)
 - `POST /api/admin/products` - Create product
 - `PUT /api/admin/products/{id}` - Update product
 - `DELETE /api/admin/products/{id}` - Delete product
@@ -101,6 +101,10 @@ Collections:
 - `PUT /api/admin/orders/{id}/status` - Update order status
 - `GET /api/admin/users` - Get all users
 - `PUT /api/admin/users/{id}/role` - Update user role
+
+### Cloudinary (cloud image storage)
+- `GET /api/cloudinary/config` - Check if Cloudinary is configured
+- `GET /api/cloudinary/signature` - Get signed upload params (auth required)
 
 ## Features Implemented
 
@@ -118,6 +122,8 @@ Collections:
 - [x] **Frontend-Backend Integration - COMPLETED**
 - [x] **Admin Panel UI - COMPLETED** (Dashboard, Products, Orders, Users, Categories, Promotions)
 - [x] **Admin Route Protection - COMPLETED** (ProtectedRoute component)
+- [x] **Product Reviews UI - COMPLETED** (ReviewForm component with star ratings)
+- [x] **Cloudinary Integration - COMPLETED** (with local upload fallback)
 
 ### Backend (December 2025 - February 2026)
 - [x] JWT Authentication with role-based access (user/admin)
