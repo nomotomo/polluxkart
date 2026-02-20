@@ -10,23 +10,56 @@ import {
   Menu,
   X,
   LogOut,
-  ChevronRight,
+  Loader2,
+  ShieldAlert,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { Card, CardContent } from '../../components/ui/card';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'sonner';
 
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
+  const [hasAccess, setHasAccess] = useState(false);
 
-  // Check if user is admin
+  // Check admin access
   useEffect(() => {
-    // For now, we'll allow access and let the API handle authorization
-    // In production, you'd check user.role here
-  }, [user, navigate]);
+    const checkAccess = async () => {
+      setIsCheckingAccess(true);
+      
+      // Wait for auth to load
+      if (isLoading) {
+        return;
+      }
+
+      // Not logged in - redirect to auth
+      if (!isAuthenticated || !user) {
+        toast.error('Please login to access admin panel');
+        navigate('/auth', { state: { from: location.pathname, isAdmin: true } });
+        return;
+      }
+
+      // Check if user has admin role
+      // For now, we'll check the user object for role
+      // The role should be set when user logs in
+      const userRole = user.role || localStorage.getItem('polluxkart-user-role');
+      
+      if (userRole === 'admin' || userRole === 'super_admin') {
+        setHasAccess(true);
+      } else {
+        setHasAccess(false);
+        toast.error('You do not have admin access');
+      }
+      
+      setIsCheckingAccess(false);
+    };
+
+    checkAccess();
+  }, [isAuthenticated, user, isLoading, navigate, location.pathname]);
 
   const menuItems = [
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
@@ -45,10 +78,52 @@ const AdminLayout = () => {
   };
 
   const handleLogout = () => {
-    logout();
+    // Clear auth
+    localStorage.removeItem('polluxkart-token');
+    localStorage.removeItem('polluxkart-user');
+    localStorage.removeItem('polluxkart-user-role');
     toast.success('Logged out successfully');
-    navigate('/');
+    navigate('/auth');
   };
+
+  // Loading state
+  if (isLoading || isCheckingAccess) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-gray-500">Checking access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // No access - show error
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="p-8 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <ShieldAlert className="h-8 w-8 text-red-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
+            <p className="text-gray-500 mb-6">
+              You don't have permission to access the admin panel. Please contact an administrator if you believe this is an error.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <Button variant="outline" onClick={() => navigate('/')}>
+                Go to Store
+              </Button>
+              <Button onClick={() => navigate('/auth')}>
+                Login as Admin
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
