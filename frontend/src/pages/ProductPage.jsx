@@ -162,6 +162,23 @@ const ProductPage = () => {
     loadProduct();
   }, [id]);
 
+  // Function to reload reviews after a new review is submitted
+  const reloadReviews = async () => {
+    try {
+      const reviewsData = await ProductService.getProductReviews(id);
+      setReviews(reviewsData || []);
+      // Also update the product review count
+      if (product) {
+        setProduct(prev => ({
+          ...prev,
+          reviews: (reviewsData?.length || 0)
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to reload reviews:', err);
+    }
+  };
+
   // Mock reviews data for display fallback
   const mockReviews = [
     {
