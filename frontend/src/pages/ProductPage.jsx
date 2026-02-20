@@ -655,51 +655,72 @@ const ProductPage = () => {
 
               {/* Reviews List */}
               <div className="lg:col-span-2 space-y-4">
-                {displayReviews.map((review) => (
-                  <Card key={review.id}>
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        <Avatar>
-                          <AvatarImage src={review.user_avatar} />
-                          <AvatarFallback>{(review.user_name || 'U')[0]}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <div>
-                              <p className="font-medium text-foreground">{review.user_name}</p>
-                              <p className="text-xs text-muted-foreground">{formatDate(review.created_at)}</p>
-                            </div>
-                            <div className="flex gap-0.5">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-4 w-4 ${
-                                    i < review.rating
-                                      ? 'text-warning fill-warning'
-                                      : 'text-muted-foreground'
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                          {review.title && (
-                            <h4 className="font-medium text-foreground mb-1">{review.title}</h4>
-                          )}
-                          <p className="text-sm text-muted-foreground">{review.comment}</p>
-                          <div className="mt-3 flex items-center gap-2">
-                            <Button variant="ghost" size="sm" className="text-xs">
-                              Helpful ({review.helpful_count || 0})
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                {/* Write Review Form */}
+                <ReviewForm 
+                  productId={product.id} 
+                  productName={product.name}
+                  onReviewSubmitted={reloadReviews}
+                />
 
-                <Button variant="outline" className="w-full">
-                  Load More Reviews
-                </Button>
+                {/* Existing Reviews */}
+                <div className="mt-6">
+                  <h3 className="font-semibold text-lg mb-4">Customer Reviews</h3>
+                  {displayReviews.length === 0 ? (
+                    <Card>
+                      <CardContent className="p-6 text-center text-muted-foreground">
+                        No reviews yet. Be the first to review this product!
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    displayReviews.map((review) => (
+                      <Card key={review.id} className="mb-4">
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <Avatar>
+                              <AvatarImage src={review.user_avatar} />
+                              <AvatarFallback>{(review.user_name || 'U')[0]}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-2">
+                                <div>
+                                  <p className="font-medium text-foreground">{review.user_name}</p>
+                                  <p className="text-xs text-muted-foreground">{formatDate(review.created_at)}</p>
+                                </div>
+                                <div className="flex gap-0.5">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      className={`h-4 w-4 ${
+                                        i < review.rating
+                                          ? 'text-warning fill-warning'
+                                          : 'text-muted-foreground'
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              {review.title && (
+                                <h4 className="font-medium text-foreground mb-1">{review.title}</h4>
+                              )}
+                              <p className="text-sm text-muted-foreground">{review.comment}</p>
+                              <div className="mt-3 flex items-center gap-2">
+                                <Button variant="ghost" size="sm" className="text-xs">
+                                  Helpful ({review.helpful_count || 0})
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
+                </div>
+
+                {displayReviews.length > 3 && (
+                  <Button variant="outline" className="w-full">
+                    Load More Reviews
+                  </Button>
+                )}
               </div>
             </div>
           </TabsContent>
