@@ -154,7 +154,7 @@ const AuthPage = () => {
     }
   };
 
-  // Verify OTP (Mock)
+  // Verify OTP using Firebase or Mock
   const verifyOtp = async (otp, isLogin = true) => {
     const otpString = otp.join('');
     if (otpString.length !== 6) {
@@ -164,23 +164,32 @@ const AuthPage = () => {
 
     setVerifyingOtp(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock verification - accept MOCK_OTP or any 6-digit code
-    if (otpString === MOCK_OTP || otpString.length === 6) {
-      if (isLogin) {
-        setLoginOtpVerified(true);
+    try {
+      const result = await OTPService.verifyOTP(otpString);
+      
+      if (result.success) {
+        if (isLogin) {
+          setLoginOtpVerified(true);
+        } else {
+          setSignupOtpVerified(true);
+        }
+        
+        if (result.isMock) {
+          toast.success('Phone number verified! (MOCK MODE)');
+        } else {
+          toast.success('Phone number verified!');
+        }
+        return true;
       } else {
-        setSignupOtpVerified(true);
+        toast.error(result.message || 'Invalid OTP. Please try again.');
+        return false;
       }
-      setVerifyingOtp(false);
-      toast.success('Phone number verified!');
-      return true;
-    } else {
-      setVerifyingOtp(false);
-      toast.error('Invalid OTP. Please try again.');
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      toast.error('Failed to verify OTP. Please try again.');
       return false;
+    } finally {
+      setVerifyingOtp(false);
     }
   };
 
