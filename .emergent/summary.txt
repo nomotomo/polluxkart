@@ -1,182 +1,198 @@
 <analysis>**original_problem_statement:**
-The user wants to build a frontend prototype for an e-commerce store named PolluxKart.
+The user initially requested a frontend prototype for an e-commerce store named PolluxKart. After the frontend was built, the user requested the development of the backend with a microservice architecture.
 
-**Product Requirements Document (PRD):**
--   **Pages:** Home, Store (with side category filters & pagination), Product Detail (with multiple images & reviews), Cart, Checkout (address & payment), Orders, and Wishlist.
--   **Design:** Use tech-savvy, organic, and fresh colours.
--   **Home Page:** Must include a section for promotions and offers, and a categories section. The Explore Categories button should trigger a modal.
--   **Categories Modal:** A scalable modal showing main categories and their respective subcategories.
--   **Store Page:** Should feature product filtering (by category/brand), sorting, and search. It must integrate with a backend API but gracefully fall back to mock data if the API is unavailable.
--   **Products:**
-    -   Out-of-stock items must be visually distinct and non-purchasable.
-    -   Prices must be displayed in Indian Rupees (₹).
--   **User & Authentication:**
-    -   User registration must include a phone number.
-    -   Login should support both email and phone number.
--   **Features:**
-    -   Wishlist functionality.
-    -   A Reorder button on the My Orders page to add a past order back to the cart.
-    -   Notifications (e.g., item added to cart) should have a close button.
--   **Branding:** A cool and catchy logo and favicon for PolluxKart.
--   **Documentation:** A root  file detailing setup and run instructions.
+**Product Requirements Document (PRD) for Backend:**
+-   **Architecture:** Microservices where possible, but using a single database (MongoDB) for now.
+-   **Authentication:** JWT token-based.
+-   **Payment Integration:** Razorpay.
+-   **Core Functionalities:**
+    -   List, sort, search, and find products.
+    -   Add to cart.
+    -   Checkout, order placement, and order status.
+-   **Additional Features:**
+    -   Inventory management.
+    -   Product reviews & ratings API.
+    -   Wishlist sync to backend.
+    -   Email notifications for order confirmation.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A complete React frontend prototype for the PolluxKart e-commerce store has been built. All requested pages (Home, Store, Product, Cart, Checkout, Orders, Wishlist, Auth) are implemented with mock data. A design system with a teal and lime green color palette is in place. The API service layer for products and cart has been created and integrated into the , with a fallback to mock data. The latest set of user requests, including the wishlist, INR currency, and phone authentication, have been coded but are not yet tested.
+A full-stack application for PolluxKart.
+-   **Frontend:** A complete React prototype with all required pages. It features unit tests (Jest), a CI pipeline (GitHub Actions), and ESLint v9 configuration. It currently uses a mix of mock data and a fallback API service layer. A recurring bug exists with the store page's search debounce functionality.
+-   **Backend:** A newly created, microservice-style backend using FastAPI and MongoDB. It includes services for products, auth, cart, orders, inventory, and payments (with Razorpay integration placeholder). The backend has been seeded with data and passed initial automated testing.
 
 **Last working item**:
-*   **Last item agent was working:** The agent was in the middle of a large feature update based on the user's latest 6 requests. It had coded the logic for all features, including creating new files and overwriting existing ones. The very last action was creating new, improved SVG files for the logo and favicon. The agent was about to update the  component to use the new design but has not done so yet.
-*   **Status:** IN PROGRESS
-*   **Agent Testing Done:** N
-*   **Which testing method agent to use?** Frontend testing agent. A large number of changes across multiple components and contexts (Auth, Cart, Wishlist, Products) were made without verification. A comprehensive test is required.
-*   **User Testing Done:** N
+*   **Last item agent was working:** The agent was asked by the user for instructions on how to host the website, cloud access details, and CI/CD pipeline setup. The agent has not yet provided an answer.
+*   **Status:** NOT STARTED
+*   **Agent Testing Done:** N/A
+*   **Which testing method agent to use?** N/A (This is a request for information).
+*   **User Testing Done:** N/A
 
 **All Pending/In progress Issue list**:
-*   **Issue 1:** Verify the fix for a corrupted file and test INR currency implementation. (P0)
-*   **Issue 2:** The  component may not be using the latest improved SVG design. (P1)
+*   **Issue 1:** Store page search debounce is not working as expected. (P0)
 
 *   **Issues Detail:**
     *   **Issue 1:**
-        *   **Attempted fixes:** A  command corrupted . The agent overwrote the file to fix it.
+        *   **Description:** The user has repeatedly reported that the search functionality on the store page does not wait for the user to finish typing. It filters immediately after a single character is entered.
+        *   **Attempted fixes:** The agent has tried multiple approaches:
+            1.  Implemented a  custom hook.
+            2.  Rewrote the  hook to be a  hook.
+            3.  Rewrote the entire search logic to use an inline  with a  timer within the  component.
+            Despite the agent's tests suggesting the debounce works, the user reports the issue persists. The screenshots taken by the agent were also confusing and showed inconsistent states, indicating a potential race condition or an issue with the testing methodology.
         *   **Next debug checklist:**
-            1.  Run yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. to ensure no syntax errors exist in  or other recently modified files.
-            2.  Thoroughly test all pages where prices are displayed (Product Card, Product Page, Cart Page, Checkout Summary, Order Page) to confirm they use the  utility and show the ₹ symbol correctly.
-        *   **Why fix this issue and what will be achieved with the fix?** To fulfill the user's requirement for INR currency and ensure the cart page functions correctly.
-        *   **Status:** TESTING PENDING
-        *   **Is recurring issue?** Y (File corruption via  is a known risk).
-        *   **Should Test frontend/backend/both after fix?** Frontend.
-        *   **Blocked on other issue:** None.
-    *   **Issue 2:**
-        *   **Attempted fixes:** New SVG files (, ) were created in the  directory.
-        *   **Next debug checklist:**
-            1.  View the content of .
-            2.  Compare its SVG code with the new code in .
-            3.  If they differ, update  with the new SVG code.
-        *   **Why fix this issue and what will be achieved with the fix?** To complete the user's request for an improved, catchy logo design.
+            1.  Review  again. The core logic is in the  function and the  that sets the .
+            2.  Simplify the state management. There are multiple state variables (, , ). Check if their interactions cause race conditions.
+            3.  Consider that the issue might be a React rendering quirk. Ensure  dependencies are correct and state updates are batched as expected.
+            4.  Create a more reliable manual or automated test that definitively proves whether the search is triggered *before* the debounce delay is over. The previous screenshot tests were inconclusive.
+        *   **Why fix this issue and what will be achieved with the fix?** This is a core user experience issue that makes searching for products difficult. Fixing it is critical for the usability of the store page.
         *   **Status:** IN PROGRESS
-        *   **Is recurring issue?** N
-        *   **Should Test frontend/backend/both after fix?** Frontend.
+        *   **Is recurring issue?** Y
+        *   **Should Test frontend/backend/both after fix?** Frontend
         *   **Blocked on other issue:** None.
 
 **In progress Task List**:
-*   **Task 1:** Complete and test the batch of 6 new features. (P0)
+*   **Task 1:** Answer user's query about hosting and CI/CD. (P0)
 
 *   **Task Detail:**
     *   **Task 1:**
-        *   **Where to resume:**
-            1.  First, resolve Issue 2 by ensuring  is updated with the new logo design.
-            2.  Run yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. to check for compilation errors after all recent changes.
-            3.  If the build succeeds, restart the frontend and use the frontend testing agent to systematically test all 6 recently implemented features: INR currency, wishlist, out-of-stock UI, phone auth, reorder button, and toaster close button.
-        *   **What will be achieved with this?** This will complete the user's latest set of feature requests and ensure the application is stable.
-        *   **Status:** IN PROGRESS
-        *   **Should Test frontend/backend/both after fix?** Frontend.
+        *   **Where to resume:** The user has asked for brief instructions on cloud hosting, access, and CI/CD setup. The agent needs to formulate and provide this information.
+        *   **What will be achieved with this?** It will address the user's direct question and provide guidance on future deployment strategies.
+        *   **Status:** NOT STARTED
+        *   **Should Test frontend/backend/both after fix?** N/A
         *   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
-*   None specified by the user. The current feature set appears to be complete from the user's perspective.
+*   **Upcoming Tasks:**
+    *   **P0: Connect Frontend to Backend:** The most significant upcoming task. The frontend's API service layer () needs to be updated to make calls to the new FastAPI backend endpoints instead of the mock URL () or local data. This will involve:
+        *   Updating , .
+        *   Creating new services for authentication, orders, and wishlist.
+        *   Integrating the JWT token from the backend into frontend API requests.
+*   **Future Tasks:**
+    *   **P1: Implement Product Reviews & Ratings:** Add UI and API integration for submitting and displaying product reviews.
+    *   **P1: Implement Wishlist Backend Sync:** Connect the frontend wishlist context to the backend API to make wishlists persistent across user sessions.
+    *   **P2: Implement Email Notifications:** Integrate an email service (e.g., SendGrid, Resend) into the backend  utility to send order confirmation emails.
+    *   **P2: Remember this device for OTP:** Add a feature so verified users don't need to enter an OTP on every login.
 
 **Completed work in this session**
--   **E-commerce UI Scaffolding:** Created Home, Store, Product Detail, Cart, Checkout, and Orders pages.
--   **Design System:** Implemented a tech-savvy, organic, and fresh theme in .
--   **Feature: Scalable Categories Modal:** Implemented in .
--   **Feature: API Integration:** Created an API service layer and integrated it into  with a mock data fallback.
--   **Documentation:** Created  and .
--   **Partial Implementation of New Features (Testing Pending):**
-    -   Wishlist page and context (, ).
-    -   Phone authentication updates (, ).
-    -   INR currency utility ().
-    -   Reorder functionality ().
-    -   Out-of-stock UI ().
+-   **Frontend Feature Implementation & Bug Fixes:**
+    -   Added a country code selector to the .
+    -   Implemented a mock OTP verification flow for phone login/registration.
+    -   Added a Categories dropdown menu to the .
+    -   Fixed INR currency display on the .
+    -   Fixed wishlist add/remove functionality.
+    -   Fixed a bug where Add to Cart/Buy Now buttons were not disabled for out-of-stock products on the .
+-   **Frontend Testing & CI/CD Setup:**
+    -   Established a unit testing framework using Jest and React Testing Library.
+    -   Moved all tests to a dedicated  directory.
+    -   Created  to support ESLint v9.
+    -   Configured  to handle test paths.
+    -   Created a GitHub Actions workflow () for automated testing, linting, and coverage reporting.
+-   **Backend Architecture & Implementation:**
+    -   Designed and built a full microservice-style backend using FastAPI.
+    -   Created services for , , , , , and .
+    -   Defined all necessary Pydantic models in .
+    -   Implemented JWT authentication in .
+    -   Set up database configuration for MongoDB.
+    -   Created all API routes in .
+    -   Created a database seeding script ().
+-   **Backend Testing:**
+    -   Successfully ran automated tests using the testing agent, confirming all 40 backend tests passed.
 
 **Earlier issues found/mentioned but not fixed**
--   None.
+-   **Issue 1:** The  search debounce functionality is still not working to the user's satisfaction, despite multiple fix attempts. This is a recurring issue from this session.
 
 **Known issue recurrence from previous fork**
--   N/A
+-   None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend:** React, Tailwind CSS, shadcn/ui
--   **State Management:** React Context API
--   **Routing:** React Router DOM
--   **API:** A service layer using  is built to communicate with a backend, with a graceful fallback to mock data if the API is unreachable.
+-   **Frontend:** React, Tailwind CSS, shadcn/ui, React Router, React Context, Jest, Craco
+-   **Backend:** FastAPI, Python, Microservice Architecture
+-   **Database:** MongoDB
+-   **Authentication:** JWT (backend)
+-   **Payments:** Razorpay (placeholder integration)
+-   **CI/CD:** GitHub Actions
 
 **key DB schema**
-N/A (Frontend prototype only)
+-   **users:** 
+-   **products:** 
+-   **inventory:** 
+-   **carts:** 
+-   **orders:** 
 
 **changes in tech stack**
-None.
+-   A full FastAPI backend has been added to the project.
 
 **All files of reference**
--   **/app/frontend/src/pages/StorePage.jsx**: Contains the primary API integration logic with mock data fallback.
--   **/app/frontend/src/components/brand/Logo.jsx**: The React component for the logo (needs verification/update).
--   **/app/frontend/src/utils/currency.js**: Utility for formatting numbers into INR.
--   **/app/frontend/src/context/WishlistContext.js**: State management for the new wishlist feature.
--   **/app/frontend/src/pages/AuthPage.jsx**: Contains the new phone number registration/login logic.
--   **/app/frontend/public/favicon.svg**: The new, improved favicon SVG code.
--   **/app/README.md**: Project setup and run instructions.
+-   **/app/frontend/src/pages/StorePage.jsx**: The location of the recurring search debounce bug.
+-   **/app/frontend/src/pages/AuthPage.jsx**: Contains the OTP login flow.
+-   **/app/frontend/src/hooks/useDebounce.js**: The custom hook for debouncing, which was modified multiple times.
+-   **/app/.github/workflows/ci.yml**: The CI configuration for frontend testing.
+-   **/app/backend/server.py**: The main entry point for the new backend.
+-   **/app/backend/routes/**: Directory containing all API endpoint definitions.
+-   **/app/backend/services/**: Directory containing all business logic.
 
 **Areas that need refactoring**:
--   The API fetching logic in  could be extracted into a reusable custom hook (e.g., ) to improve code organization, but it is currently functional.
+-   The frontend API service layer in  needs a complete overhaul to connect to the new backend endpoints and handle JWT authentication.
 
 **key api endpoints**
 -   
 -   
+-    (with query params for sort, search, filter)
 -   
 -   
--   _Note: The frontend is configured to call these endpoints at ._
+-   
+-   
+-   
 
 **Critical Info for New Agent**
--   Your immediate task is to finalize and test a large batch of 6 new features. The code has been written but is completely unverified.
--   **Start by fixing the logo**: The agent created new SVG files for the logo but likely forgot to update the  React component. Verify this and update the component with the new SVG code from .
--   **Test everything**: After fixing the logo, run yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command., then use the frontend testing agent to meticulously check all 6 new features:
-    1.  **INR Currency (₹)** on all pages.
-    2.  **Wishlist**: Add/remove items, view the wishlist page.
-    3.  **Out-of-Stock**: Find a product with  in  and ensure its Add to Cart button is disabled.
-    4.  **Phone Auth**: Test registration with a phone number and login with it.
-    5.  **Reorder**: Go to the orders page and test the Reorder button.
-    6.  **Notifications**: Add an item to the cart and verify the toaster notification has a close 'x' button.
--   The application is designed to work offline. All API calls will fail (which is expected) and fall back to using mock data from .
+-   **Highest Priority (P0):** Fix the search debounce on the Store page (). The user has reported this multiple times. Your primary goal should be to deliver a fix that the user accepts. Do not assume previous attempts were correct; investigate the issue from scratch.
+-   **Second Priority (P0):** Address the user's last question about hosting, cloud access, and CI/CD setup. Provide a clear and concise explanation.
+-   **Next Major Task:** After resolving the above, the main goal is to connect the React frontend to the new FastAPI backend. This will involve updating the service files in  and implementing token handling.
+-   The backend is new and structured as microservices. Familiarize yourself with the layout in .
+-   The frontend has a working CI pipeline. Any changes to the frontend should pass the tests defined in .
 
 **documents and test reports created in this job**
+-    (updated with backend requirements)
 -   
 -   
--   
+-    (Frontend test report)
+-    (Backend test report)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Requested 6 new features (INR currency, phone auth, wishlist, etc.). *(Status: IN PROGRESS)*
-2.  **Agent:** Acknowledged request.
-3.  **User:** Asked for setup instructions in a root . *(Status: COMPLETED)*
-4.  **Agent:** Created the  file.
-5.  **User:** Provided Angular code as a reference for backend API integration. *(Status: COMPLETED)*
-6.  **Agent:** Implemented the API service layer.
-7.  **User:** Requested a cool logo and favicon. *(Status: COMPLETED, but improvement requested)*
-8.  **Agent:** Created and integrated the first version of the logo.
-9.  **User:** Requested a scalable categories modal instead of a separate page. *(Status: COMPLETED)*
-10. **Agent:** Implemented the categories modal.
+1.  **User:** Reports search is still not working correctly. *(Status: UNRESOLVED)*
+2.  **Agent:** Apologizes and attempts another fix for the debounce issue.
+3.  **User:** Reports the OTP input cursor doesn't auto-focus to the next box. *(Status: RESOLVED)*
+4.  **Agent:** Fixes the OTP input auto-focus issue.
+5.  **User:** Reports search is not working and navbar search causes an error. *(Status: PARTIALLY RESOLVED, search debounce still an issue)*
+6.  **Agent:** Fixes the navbar error and investigates the search debounce again.
+7.  **User:** Reports CI is failing and asks for better test reports. *(Status: RESOLVED)*
+8.  **Agent:** Fixes the CI pipeline, moves tests, adds ESLint v9 config, and improves test reporting.
+9.  **User:** Gives approval to start building the backend and specifies requirements (Razorpay, JWT, single DB, etc.). *(Status: COMPLETED)*
+10. **Agent:** Builds the entire backend microservice architecture.
+11. **User:** Asks for instructions on how to host the website and set up CI/CD. *(Status: PENDING)*
 
 **Project Health Check:**
--   **Broken:** Potentially. A large number of files were modified to implement new features, but no build or testing was performed. The state is unknown until tested.
--   **Mocked:** The entire backend is mocked. The application gracefully falls back to mock data when API calls fail, which they will in the current environment. All user-specific data (cart, wishlist, auth) is stored on the client-side and is not persistent.
+-   **Broken:** The search functionality on the frontend  is considered broken from the user's perspective due to the persistent debounce issue.
+-   **Mocked:** The frontend is still disconnected from the new backend, effectively making all data interactions (products, cart, auth, orders) client-side mocks.
 
 **3rd Party Integrations**
--   None requiring API keys.
+-   **Razorpay:** For payment processing. An integration playbook was retrieved.  and  need to be set in .
+-   **JWT:** For backend authentication. Implemented using .
 
 **Testing status**
--   **Testing agent used after significant changes:** NO (not after the last major batch of changes).
--   **Troubleshoot agent used after agent stuck in loop:** N/A
--   **Test files created:** None.
--   **Known regressions:** None are known, but the risk of regression is high due to the recent unverified changes.
+-   **Testing agent used after significant changes:** YES. Used for both frontend and backend testing.
+-   **Troubleshoot agent used after agent stuck in loop:** NO.
+-   **Test files created:** Yes, in . Includes tests for country codes, currency, products, and the debounce hook.
+-   **Known regressions:** The search functionality on the Store Page is a persistent bug that has regressed despite multiple fixes.
 
 **Credentials to test flow:**
-N/A - Authentication is mocked. Any credentials will work for testing the UI flow.
+-   **Backend:** The  script creates a test user. Credentials:
+    -   **Email:** 
+    -   **Password:** 
 
 **What agent forgot to execute**
--   The agent did not update the  component to use the new, improved SVG design it created.
--   The agent did not perform a build or any testing after implementing the last batch of 6 feature requests.</analysis>
+-   The agent has not yet answered the user's direct question about hosting, cloud providers, and CI/CD setup instructions. This was the user's very last request.</analysis>
