@@ -226,8 +226,22 @@ CLOUDINARY_API_SECRET=your_api_secret  # Optional
 - [ ] Add user profile/settings page
 
 ### P2 - Nice to Have
-- [ ] Cloud image storage (S3/Cloudinary migration)
-- [ ] Add coupon/discount codes
+- [ ] Add coupon/discount codes UI on checkout
 - [ ] Add order invoice PDF generation
 - [ ] Add social login (Google/Facebook)
 - [ ] "Remember this device" for OTP
+
+## Cloudinary Setup Instructions
+To enable cloud image storage, add the following to your backend `.env`:
+
+1. Create a free Cloudinary account at https://cloudinary.com
+2. Go to Dashboard and copy your credentials
+3. Add to `/app/backend/.env`:
+```
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+4. Restart the backend service
+
+Without these keys, image uploads will fall back to local storage.
