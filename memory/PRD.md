@@ -135,9 +135,10 @@ Collections:
 - [x] Inventory management with stock movements
 - [x] Product reviews & ratings
 - [x] Email notifications (templates ready)
-- [x] Pytest tests (47 passing)
+- [x] Pytest tests (62 passing)
 - [x] **Admin APIs - COMPLETED** (Dashboard, Products, Categories, Promotions, Orders, Users)
-- [x] **Image Upload API - COMPLETED** (local async file uploads)
+- [x] **Image Upload API - COMPLETED** (Cloudinary + local fallback)
+- [x] **Cloudinary Integration - COMPLETED** (signed upload flow)
 
 ## Frontend-Backend Integration (December 2025)
 
@@ -148,6 +149,8 @@ Collections:
 - `cartService.js` - Cart operations (syncs with backend when authenticated)
 - `wishlistService.js` - Wishlist operations (syncs with backend when authenticated)
 - `orderService.js` - Order management
+- `adminService.js` - Admin CRUD operations with Cloudinary support
+- `cloudinaryService.js` - Cloud image upload with signed uploads
 
 ### Context Updates
 - `AuthContext.js` - Real API login/signup, JWT token storage
