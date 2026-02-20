@@ -39,7 +39,12 @@ export const uploadImage = async (file, onProgress = null) => {
     throw new Error(error.detail || 'Upload failed');
   }
   
-  return await response.json();
+  const result = await response.json();
+  // Prepend base URL to local uploads
+  if (result.url && result.url.startsWith('/api/')) {
+    result.url = `${API_CONFIG.baseUrl}${result.url}`;
+  }
+  return result;
 };
 
 export const uploadMultipleImages = async (files, onProgress = null) => {
