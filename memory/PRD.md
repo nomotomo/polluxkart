@@ -177,7 +177,7 @@ Collections:
 - 1 Test user
 
 ## Known Mocked Elements
-- **OTP Verification**: Frontend mock - any 6-digit code works (123456 recommended)
+- **OTP Verification**: Uses Firebase Phone Auth when configured, falls back to mock mode (123456) otherwise
 - **Razorpay**: Mock order IDs generated when API keys not configured
 - **Email Notifications**: SMTP not configured - logs to console
 
@@ -198,6 +198,18 @@ CLOUDINARY_API_KEY=your_api_key  # Optional
 CLOUDINARY_API_SECRET=your_api_secret  # Optional
 ```
 
+### Frontend (.env)
+```
+REACT_APP_BACKEND_URL=https://your-domain.com
+# Firebase Configuration (for Phone OTP - 10K free verifications/month)
+REACT_APP_FIREBASE_API_KEY=your-api-key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your-project-id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+REACT_APP_FIREBASE_APP_ID=your-app-id
+```
+
 ## Test Results
 - **Backend Tests**: 62/62 passing (100%)
 - **Frontend Integration**: All features tested and working
@@ -206,6 +218,7 @@ CLOUDINARY_API_SECRET=your_api_secret  # Optional
 - **Admin Products**: Verified - loads without 422 error (pageSize=50)
 - **Product Reviews UI**: Verified - form displays for logged-in users
 - **Cloudinary Integration**: Verified - graceful fallback to local uploads
+- **Firebase OTP**: Ready - graceful fallback to mock mode when not configured
 
 ## Next Steps (Backlog)
 
