@@ -287,14 +287,48 @@ const AdminCategories = () => {
               />
             </div>
 
+            {/* Image Upload */}
             <div className="space-y-2">
-              <Label htmlFor="image">Image URL</Label>
-              <Input
-                id="image"
-                value={formData.image}
-                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                placeholder="https://..."
-              />
+              <Label>Category Image</Label>
+              {formData.image ? (
+                <div className="relative w-32 h-32">
+                  <img
+                    src={formData.image}
+                    alt="Category"
+                    className="w-full h-full object-cover rounded-lg border"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed rounded-lg p-4">
+                  <input
+                    type="file"
+                    id="category-image-upload"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageUpload}
+                  />
+                  <label
+                    htmlFor="category-image-upload"
+                    className="flex flex-col items-center justify-center cursor-pointer py-4"
+                  >
+                    {uploadingImage ? (
+                      <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+                    ) : (
+                      <Upload className="h-8 w-8 text-gray-400" />
+                    )}
+                    <span className="mt-2 text-sm text-gray-500">
+                      {uploadingImage ? 'Uploading...' : 'Click to upload image'}
+                    </span>
+                  </label>
+                </div>
+              )}
             </div>
 
             <DialogFooter>
