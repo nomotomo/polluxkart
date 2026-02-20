@@ -11,6 +11,7 @@ import {
   CreditCard,
   RefreshCw,
   ShoppingCart,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -27,6 +28,7 @@ import {
 } from '../components/ui/breadcrumb';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import OrderService from '../services/orderService';
 import { formatPrice } from '../utils/currency';
 import { toast } from 'sonner';
 
@@ -35,12 +37,56 @@ const OrdersPage = () => {
   const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
   const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load orders from localStorage
-    const savedOrders = JSON.parse(localStorage.getItem('polluxkart-orders') || '[]');
-    setOrders(savedOrders.reverse()); // Most recent first
-  }, []);
+    const loadOrders = async () => {
+      if (!isAuthenticated) {
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        const response = await OrderService.getOrders();
+        // Transform API response to match expected format
+        const transformedOrders = (response.orders || []).map(order => ({
+          id: order.id,
+          orderNumber: order.order_number,
+          date: order.created_at,
+          status: order.status,
+          paymentStatus: order.payment_status,
+          paymentMethod: order.payment_method,
+          items: order.items.map(item => ({
+            id: item.product_id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image,
+            total: item.total,
+          })),
+          shipping: order.shipping_fee,
+          tax: order.tax,
+          subtotal: order.subtotal,
+          total: order.total,
+          address: order.shipping_address ? {
+            name: order.shipping_address.full_name,
+            street: order.shipping_address.address_line1,
+            city: order.shipping_address.city,
+            state: order.shipping_address.state,
+            pincode: order.shipping_address.pincode,
+          } : null,
+        }));
+        setOrders(transformedOrders);
+      } catch (error) {
+        console.error('Failed to load orders:', error);
+        toast.error('Failed to load orders');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadOrders();
+  }, [isAuthenticated]);
 
   const handleReorder = (order) => {
     // Add all items from the order to cart
