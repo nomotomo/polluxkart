@@ -170,6 +170,17 @@ const CheckoutPage = () => {
   };
 
   const initiateRazorpayPayment = async (order) => {
+    // Check if running on localhost - skip Razorpay and simulate success
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    if (isLocalhost) {
+      // Simulate successful payment for local development
+      toast.success('Local mode: Payment simulated as successful!');
+      clearCart();
+      navigate('/orders');
+      return;
+    }
+
     if (!razorpayLoaded) {
       toast.error('Payment gateway is loading. Please try again.');
       return;
