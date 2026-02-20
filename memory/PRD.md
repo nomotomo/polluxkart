@@ -232,9 +232,10 @@ REACT_APP_FIREBASE_APP_ID=your-app-id
 
 ### P1 - Important
 - [x] ~~Wire up admin panel forms~~ ✅ COMPLETED (Categories, Promotions already working)
+- [x] ~~Add real OTP service~~ ✅ COMPLETED (Firebase Phone Auth integrated)
 - [ ] Configure Cloudinary API keys for production
+- [ ] Configure Firebase API keys for production OTP
 - [ ] Configure SMTP for email notifications
-- [ ] Add real OTP service (Twilio/AWS SNS)
 - [ ] Add order tracking with status updates
 - [ ] Add user profile/settings page
 
