@@ -33,6 +33,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import ProductService from '../services/productService';
 import ProductCard from '../components/products/ProductCard';
+import ReviewForm from '../components/products/ReviewForm';
 import { formatPrice } from '../utils/currency';
 import { toast } from 'sonner';
 
