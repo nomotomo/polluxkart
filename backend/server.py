@@ -12,6 +12,7 @@ from routes import (
     orders_router, payments_router, inventory_router
 )
 from routes.admin import router as admin_router
+from routes.cloudinary_upload import router as cloudinary_router
 
 # Configure logging
 logging.basicConfig(
@@ -84,6 +85,7 @@ app.include_router(orders_router, prefix="/api")
 app.include_router(payments_router, prefix="/api")
 app.include_router(inventory_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
+app.include_router(cloudinary_router, prefix="/api")
 
 # Serve uploaded images
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
