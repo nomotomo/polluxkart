@@ -193,7 +193,7 @@ const Header = () => {
               size="icon" 
               className="relative hidden sm:flex"
               onClick={() => navigate('/wishlist')}
-              data-testid="wishlist-btn"
+              data-testid="header-wishlist-btn"
             >
               <Heart className="h-5 w-5" />
               {wishlistCount > 0 && (
