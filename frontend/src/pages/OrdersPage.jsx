@@ -165,6 +165,19 @@ const OrdersPage = () => {
     );
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+            <p className="text-muted-foreground">Loading your orders...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (orders.length === 0) {
     return (
       <div className="min-h-screen bg-background">
