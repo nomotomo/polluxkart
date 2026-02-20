@@ -84,7 +84,7 @@ const AdminProducts = () => {
     setIsLoading(true);
     try {
       const [productsData, categoriesData] = await Promise.all([
-        ProductService.getProducts({ pageSize: 100 }),
+        ProductService.getProducts({ pageSize: 50 }),
         ProductService.getCategories(),
       ]);
       setProducts(productsData.products || []);
