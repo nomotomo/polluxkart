@@ -76,6 +76,27 @@ const AdminCategories = () => {
     }
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const result = await AdminService.uploadImage(file);
+      setFormData(prev => ({ ...prev, image: result.url }));
+      toast.success('Image uploaded successfully');
+    } catch (error) {
+      toast.error('Failed to upload image');
+      console.error(error);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, image: '' }));
+  };
+
   const openCreateDialog = () => {
     setSelectedCategory(null);
     setFormData({
