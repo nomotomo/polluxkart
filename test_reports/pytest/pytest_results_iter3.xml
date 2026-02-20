@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="15" failures="25" skipped="0" tests="40" time="0.847" timestamp="2026-02-20T17:04:19.094188+00:00" hostname="agent-env-b73a60bb-cb2c-4d07-9d8a-46c62984e01e"><testcase classname="backend.tests.test_auth.TestAuthRegister" name="test_register_new_user_success" time="0.001"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/auth/register': No scheme supplied. Perhaps you meant https:///api/auth/register?">backend/tests/test_auth.py:24: in test_register_new_user_success
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="40" skipped="0" tests="40" time="1.746" timestamp="2026-02-20T17:04:36.276012+00:00" hostname="agent-env-b73a60bb-cb2c-4d07-9d8a-46c62984e01e"><testcase classname="backend.tests.test_auth.TestAuthRegister" name="test_register_new_user_success" time="0.001"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/auth/register': No scheme supplied. Perhaps you meant https:///api/auth/register?">backend/tests/test_auth.py:24: in test_register_new_user_success
     response = api_client.post(f"{BASE_URL}/api/auth/register", json=user_data)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:637: in post
@@ -117,23 +117,9 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme 
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/cart': No scheme supplied. Perhaps you meant https:///api/cart?</failure></testcase><testcase classname="backend.tests.test_cart_wishlist.TestCart" name="test_get_cart_authenticated" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?&quot;">backend/tests/conftest.py:42: in auth_token
-    response = session.post(
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:637: in post
-    return self.request("POST", url, data=data, json=json, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:575: in request
-    prep = self.prepare_request(req)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:484: in prepare_request
-    p.prepare(
-/root/.venv/lib/python3.11/site-packages/requests/models.py:367: in prepare
-    self.prepare_url(url, params)
-/root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
-    raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?</error></testcase><testcase classname="backend.tests.test_cart_wishlist.TestCart" name="test_add_to_cart" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?&quot;">backend/tests/conftest.py:75: in sample_product_id
-    response = session.get(f"{base_url}/api/products?page_size=1")
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   requests.exceptions.MissingSchema: Invalid URL '/api/cart': No scheme supplied. Perhaps you meant https:///api/cart?</failure></testcase><testcase classname="backend.tests.test_cart_wishlist.TestCart" name="test_get_cart_authenticated" time="0.771"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/cart': No scheme supplied. Perhaps you meant https:///api/cart?">backend/tests/test_cart_wishlist.py:25: in test_get_cart_authenticated
+    response = authenticated_client.get(f"{BASE_URL}/api/cart")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
     return self.request("GET", url, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -146,8 +132,9 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme 
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?</error></testcase><testcase classname="backend.tests.test_cart_wishlist.TestCart" name="test_add_to_cart_invalid_product" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?&quot;">backend/tests/conftest.py:42: in auth_token
-    response = session.post(
+E   requests.exceptions.MissingSchema: Invalid URL '/api/cart': No scheme supplied. Perhaps you meant https:///api/cart?</failure></testcase><testcase classname="backend.tests.test_cart_wishlist.TestCart" name="test_add_to_cart" time="0.118"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/cart/items': No scheme supplied. Perhaps you meant https:///api/cart/items?">backend/tests/test_cart_wishlist.py:50: in test_add_to_cart
+    response = authenticated_client.post(f"{BASE_URL}/api/cart/items", json=item_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:637: in post
     return self.request("POST", url, data=data, json=json, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -160,7 +147,22 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': 
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?</error></testcase><testcase classname="backend.tests.test_cart_wishlist.TestWishlist" name="test_get_wishlist_requires_auth" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/wishlist': No scheme supplied. Perhaps you meant https:///api/wishlist?">backend/tests/test_cart_wishlist.py:85: in test_get_wishlist_requires_auth
+E   requests.exceptions.MissingSchema: Invalid URL '/api/cart/items': No scheme supplied. Perhaps you meant https:///api/cart/items?</failure></testcase><testcase classname="backend.tests.test_cart_wishlist.TestCart" name="test_add_to_cart_invalid_product" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/cart/items': No scheme supplied. Perhaps you meant https:///api/cart/items?">backend/tests/test_cart_wishlist.py:71: in test_add_to_cart_invalid_product
+    response = authenticated_client.post(f"{BASE_URL}/api/cart/items", json=item_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:637: in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:575: in request
+    prep = self.prepare_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:484: in prepare_request
+    p.prepare(
+/root/.venv/lib/python3.11/site-packages/requests/models.py:367: in prepare
+    self.prepare_url(url, params)
+/root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
+    raise MissingSchema(
+E   requests.exceptions.MissingSchema: Invalid URL '/api/cart/items': No scheme supplied. Perhaps you meant https:///api/cart/items?</failure></testcase><testcase classname="backend.tests.test_cart_wishlist.TestWishlist" name="test_get_wishlist_requires_auth" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/wishlist': No scheme supplied. Perhaps you meant https:///api/wishlist?">backend/tests/test_cart_wishlist.py:85: in test_get_wishlist_requires_auth
     response = api_client.get(f"{BASE_URL}/api/wishlist")
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
@@ -175,23 +177,9 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme 
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/wishlist': No scheme supplied. Perhaps you meant https:///api/wishlist?</failure></testcase><testcase classname="backend.tests.test_cart_wishlist.TestWishlist" name="test_get_wishlist_authenticated" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?&quot;">backend/tests/conftest.py:42: in auth_token
-    response = session.post(
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:637: in post
-    return self.request("POST", url, data=data, json=json, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:575: in request
-    prep = self.prepare_request(req)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:484: in prepare_request
-    p.prepare(
-/root/.venv/lib/python3.11/site-packages/requests/models.py:367: in prepare
-    self.prepare_url(url, params)
-/root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
-    raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?</error></testcase><testcase classname="backend.tests.test_cart_wishlist.TestWishlist" name="test_add_to_wishlist" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?&quot;">backend/tests/conftest.py:75: in sample_product_id
-    response = session.get(f"{base_url}/api/products?page_size=1")
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   requests.exceptions.MissingSchema: Invalid URL '/api/wishlist': No scheme supplied. Perhaps you meant https:///api/wishlist?</failure></testcase><testcase classname="backend.tests.test_cart_wishlist.TestWishlist" name="test_get_wishlist_authenticated" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/wishlist': No scheme supplied. Perhaps you meant https:///api/wishlist?">backend/tests/test_cart_wishlist.py:92: in test_get_wishlist_authenticated
+    response = authenticated_client.get(f"{BASE_URL}/api/wishlist")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
     return self.request("GET", url, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -204,8 +192,9 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme 
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?</error></testcase><testcase classname="backend.tests.test_cart_wishlist.TestWishlist" name="test_add_to_wishlist_invalid_product" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?&quot;">backend/tests/conftest.py:42: in auth_token
-    response = session.post(
+E   requests.exceptions.MissingSchema: Invalid URL '/api/wishlist': No scheme supplied. Perhaps you meant https:///api/wishlist?</failure></testcase><testcase classname="backend.tests.test_cart_wishlist.TestWishlist" name="test_add_to_wishlist" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/wishlist/items': No scheme supplied. Perhaps you meant https:///api/wishlist/items?">backend/tests/test_cart_wishlist.py:113: in test_add_to_wishlist
+    response = authenticated_client.post(f"{BASE_URL}/api/wishlist/items", json=item_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:637: in post
     return self.request("POST", url, data=data, json=json, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -218,9 +207,24 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': 
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?</error></testcase><testcase classname="backend.tests.test_cart_wishlist.TestWishlist" name="test_check_product_in_wishlist" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?&quot;">backend/tests/conftest.py:75: in sample_product_id
-    response = session.get(f"{base_url}/api/products?page_size=1")
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   requests.exceptions.MissingSchema: Invalid URL '/api/wishlist/items': No scheme supplied. Perhaps you meant https:///api/wishlist/items?</failure></testcase><testcase classname="backend.tests.test_cart_wishlist.TestWishlist" name="test_add_to_wishlist_invalid_product" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/wishlist/items': No scheme supplied. Perhaps you meant https:///api/wishlist/items?">backend/tests/test_cart_wishlist.py:132: in test_add_to_wishlist_invalid_product
+    response = authenticated_client.post(f"{BASE_URL}/api/wishlist/items", json=item_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:637: in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:575: in request
+    prep = self.prepare_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:484: in prepare_request
+    p.prepare(
+/root/.venv/lib/python3.11/site-packages/requests/models.py:367: in prepare
+    self.prepare_url(url, params)
+/root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
+    raise MissingSchema(
+E   requests.exceptions.MissingSchema: Invalid URL '/api/wishlist/items': No scheme supplied. Perhaps you meant https:///api/wishlist/items?</failure></testcase><testcase classname="backend.tests.test_cart_wishlist.TestWishlist" name="test_check_product_in_wishlist" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/wishlist/check/72664cc8-ac9d-4db2-b474-b363c774bbb8': No scheme supplied. Perhaps you meant https:///api/wishlist/check/72664cc8-ac9d-4db2-b474-b363c774bbb8?">backend/tests/test_cart_wishlist.py:142: in test_check_product_in_wishlist
+    response = authenticated_client.get(f"{BASE_URL}/api/wishlist/check/{sample_product_id}")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
     return self.request("GET", url, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -233,7 +237,7 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme 
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?</error></testcase><testcase classname="backend.tests.test_health.TestHealthCheck" name="test_health_endpoint_returns_200" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/health': No scheme supplied. Perhaps you meant https:///api/health?">backend/tests/test_health.py:15: in test_health_endpoint_returns_200
+E   requests.exceptions.MissingSchema: Invalid URL '/api/wishlist/check/72664cc8-ac9d-4db2-b474-b363c774bbb8': No scheme supplied. Perhaps you meant https:///api/wishlist/check/72664cc8-ac9d-4db2-b474-b363c774bbb8?</failure></testcase><testcase classname="backend.tests.test_health.TestHealthCheck" name="test_health_endpoint_returns_200" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/health': No scheme supplied. Perhaps you meant https:///api/health?">backend/tests/test_health.py:15: in test_health_endpoint_returns_200
     response = api_client.get(f"{BASE_URL}/api/health")
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
@@ -278,9 +282,9 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/health': No scheme supp
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/docs': No scheme supplied. Perhaps you meant https:///api/docs?</failure></testcase><testcase classname="backend.tests.test_inventory.TestInventory" name="test_get_product_inventory" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?&quot;">backend/tests/conftest.py:75: in sample_product_id
-    response = session.get(f"{base_url}/api/products?page_size=1")
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   requests.exceptions.MissingSchema: Invalid URL '/api/docs': No scheme supplied. Perhaps you meant https:///api/docs?</failure></testcase><testcase classname="backend.tests.test_inventory.TestInventory" name="test_get_product_inventory" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/inventory/72664cc8-ac9d-4db2-b474-b363c774bbb8': No scheme supplied. Perhaps you meant https:///api/inventory/72664cc8-ac9d-4db2-b474-b363c774bbb8?">backend/tests/test_inventory.py:18: in test_get_product_inventory
+    response = api_client.get(f"{BASE_URL}/api/inventory/{sample_product_id}")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
     return self.request("GET", url, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -293,7 +297,7 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/docs': No scheme suppli
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?</error></testcase><testcase classname="backend.tests.test_inventory.TestInventory" name="test_get_inventory_not_found" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/inventory/non-existent-product-id-12345': No scheme supplied. Perhaps you meant https:///api/inventory/non-existent-product-id-12345?">backend/tests/test_inventory.py:37: in test_get_inventory_not_found
+E   requests.exceptions.MissingSchema: Invalid URL '/api/inventory/72664cc8-ac9d-4db2-b474-b363c774bbb8': No scheme supplied. Perhaps you meant https:///api/inventory/72664cc8-ac9d-4db2-b474-b363c774bbb8?</failure></testcase><testcase classname="backend.tests.test_inventory.TestInventory" name="test_get_inventory_not_found" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/inventory/non-existent-product-id-12345': No scheme supplied. Perhaps you meant https:///api/inventory/non-existent-product-id-12345?">backend/tests/test_inventory.py:37: in test_get_inventory_not_found
     response = api_client.get(f"{BASE_URL}/api/inventory/{fake_id}")
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
@@ -308,9 +312,9 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': 
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/inventory/non-existent-product-id-12345': No scheme supplied. Perhaps you meant https:///api/inventory/non-existent-product-id-12345?</failure></testcase><testcase classname="backend.tests.test_inventory.TestInventory" name="test_get_available_stock" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?&quot;">backend/tests/conftest.py:75: in sample_product_id
-    response = session.get(f"{base_url}/api/products?page_size=1")
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   requests.exceptions.MissingSchema: Invalid URL '/api/inventory/non-existent-product-id-12345': No scheme supplied. Perhaps you meant https:///api/inventory/non-existent-product-id-12345?</failure></testcase><testcase classname="backend.tests.test_inventory.TestInventory" name="test_get_available_stock" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/inventory/72664cc8-ac9d-4db2-b474-b363c774bbb8/available': No scheme supplied. Perhaps you meant https:///api/inventory/72664cc8-ac9d-4db2-b474-b363c774bbb8/available?">backend/tests/test_inventory.py:46: in test_get_available_stock
+    response = api_client.get(f"{BASE_URL}/api/inventory/{sample_product_id}/available")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
     return self.request("GET", url, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -323,7 +327,7 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/inventory/non-existent-
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?</error></testcase><testcase classname="backend.tests.test_orders.TestOrders" name="test_get_orders_requires_auth" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/orders': No scheme supplied. Perhaps you meant https:///api/orders?">backend/tests/test_orders.py:18: in test_get_orders_requires_auth
+E   requests.exceptions.MissingSchema: Invalid URL '/api/inventory/72664cc8-ac9d-4db2-b474-b363c774bbb8/available': No scheme supplied. Perhaps you meant https:///api/inventory/72664cc8-ac9d-4db2-b474-b363c774bbb8/available?</failure></testcase><testcase classname="backend.tests.test_orders.TestOrders" name="test_get_orders_requires_auth" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/orders': No scheme supplied. Perhaps you meant https:///api/orders?">backend/tests/test_orders.py:18: in test_get_orders_requires_auth
     response = api_client.get(f"{BASE_URL}/api/orders")
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
@@ -338,51 +342,9 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': 
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/orders': No scheme supplied. Perhaps you meant https:///api/orders?</failure></testcase><testcase classname="backend.tests.test_orders.TestOrders" name="test_get_orders_authenticated" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?&quot;">backend/tests/conftest.py:42: in auth_token
-    response = session.post(
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:637: in post
-    return self.request("POST", url, data=data, json=json, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:575: in request
-    prep = self.prepare_request(req)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:484: in prepare_request
-    p.prepare(
-/root/.venv/lib/python3.11/site-packages/requests/models.py:367: in prepare
-    self.prepare_url(url, params)
-/root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
-    raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?</error></testcase><testcase classname="backend.tests.test_orders.TestOrders" name="test_get_orders_with_pagination" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?&quot;">backend/tests/conftest.py:42: in auth_token
-    response = session.post(
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:637: in post
-    return self.request("POST", url, data=data, json=json, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:575: in request
-    prep = self.prepare_request(req)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:484: in prepare_request
-    p.prepare(
-/root/.venv/lib/python3.11/site-packages/requests/models.py:367: in prepare
-    self.prepare_url(url, params)
-/root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
-    raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?</error></testcase><testcase classname="backend.tests.test_orders.TestOrders" name="test_create_order_empty_cart_fails" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?&quot;">backend/tests/conftest.py:42: in auth_token
-    response = session.post(
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:637: in post
-    return self.request("POST", url, data=data, json=json, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:575: in request
-    prep = self.prepare_request(req)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^
-/root/.venv/lib/python3.11/site-packages/requests/sessions.py:484: in prepare_request
-    p.prepare(
-/root/.venv/lib/python3.11/site-packages/requests/models.py:367: in prepare
-    self.prepare_url(url, params)
-/root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
-    raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme supplied. Perhaps you meant https:///api/auth/login?</error></testcase><testcase classname="backend.tests.test_orders.TestOrders" name="test_create_order_with_items" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?&quot;">backend/tests/conftest.py:75: in sample_product_id
-    response = session.get(f"{base_url}/api/products?page_size=1")
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   requests.exceptions.MissingSchema: Invalid URL '/api/orders': No scheme supplied. Perhaps you meant https:///api/orders?</failure></testcase><testcase classname="backend.tests.test_orders.TestOrders" name="test_get_orders_authenticated" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/orders': No scheme supplied. Perhaps you meant https:///api/orders?">backend/tests/test_orders.py:25: in test_get_orders_authenticated
+    response = authenticated_client.get(f"{BASE_URL}/api/orders")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
     return self.request("GET", url, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -395,7 +357,51 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/auth/login': No scheme 
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?</error></testcase><testcase classname="backend.tests.test_products.TestProductsList" name="test_get_products_default" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/products': No scheme supplied. Perhaps you meant https:///api/products?">backend/tests/test_products.py:15: in test_get_products_default
+E   requests.exceptions.MissingSchema: Invalid URL '/api/orders': No scheme supplied. Perhaps you meant https:///api/orders?</failure></testcase><testcase classname="backend.tests.test_orders.TestOrders" name="test_get_orders_with_pagination" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/orders?page=1&amp;page_size=5': No scheme supplied. Perhaps you meant https:///api/orders?page=1&amp;page_size=5?">backend/tests/test_orders.py:40: in test_get_orders_with_pagination
+    response = authenticated_client.get(f"{BASE_URL}/api/orders?page=1&amp;page_size=5")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
+    return self.request("GET", url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:575: in request
+    prep = self.prepare_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:484: in prepare_request
+    p.prepare(
+/root/.venv/lib/python3.11/site-packages/requests/models.py:367: in prepare
+    self.prepare_url(url, params)
+/root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
+    raise MissingSchema(
+E   requests.exceptions.MissingSchema: Invalid URL '/api/orders?page=1&amp;page_size=5': No scheme supplied. Perhaps you meant https:///api/orders?page=1&amp;page_size=5?</failure></testcase><testcase classname="backend.tests.test_orders.TestOrders" name="test_create_order_empty_cart_fails" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/cart': No scheme supplied. Perhaps you meant https:///api/cart?">backend/tests/test_orders.py:51: in test_create_order_empty_cart_fails
+    authenticated_client.delete(f"{BASE_URL}/api/cart")
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:671: in delete
+    return self.request("DELETE", url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:575: in request
+    prep = self.prepare_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:484: in prepare_request
+    p.prepare(
+/root/.venv/lib/python3.11/site-packages/requests/models.py:367: in prepare
+    self.prepare_url(url, params)
+/root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
+    raise MissingSchema(
+E   requests.exceptions.MissingSchema: Invalid URL '/api/cart': No scheme supplied. Perhaps you meant https:///api/cart?</failure></testcase><testcase classname="backend.tests.test_orders.TestOrders" name="test_create_order_with_items" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/cart/items': No scheme supplied. Perhaps you meant https:///api/cart/items?">backend/tests/test_orders.py:84: in test_create_order_with_items
+    cart_response = authenticated_client.post(f"{BASE_URL}/api/cart/items", json=item_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:637: in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:575: in request
+    prep = self.prepare_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:484: in prepare_request
+    p.prepare(
+/root/.venv/lib/python3.11/site-packages/requests/models.py:367: in prepare
+    self.prepare_url(url, params)
+/root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
+    raise MissingSchema(
+E   requests.exceptions.MissingSchema: Invalid URL '/api/cart/items': No scheme supplied. Perhaps you meant https:///api/cart/items?</failure></testcase><testcase classname="backend.tests.test_products.TestProductsList" name="test_get_products_default" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/products': No scheme supplied. Perhaps you meant https:///api/products?">backend/tests/test_products.py:15: in test_get_products_default
     response = api_client.get(f"{BASE_URL}/api/products")
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
@@ -545,9 +551,9 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/products/categories?inc
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/products/brands': No scheme supplied. Perhaps you meant https:///api/products/brands?</failure></testcase><testcase classname="backend.tests.test_products.TestSingleProduct" name="test_get_product_by_id" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?&quot;">backend/tests/conftest.py:75: in sample_product_id
-    response = session.get(f"{base_url}/api/products?page_size=1")
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   requests.exceptions.MissingSchema: Invalid URL '/api/products/brands': No scheme supplied. Perhaps you meant https:///api/products/brands?</failure></testcase><testcase classname="backend.tests.test_products.TestSingleProduct" name="test_get_product_by_id" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/products/72664cc8-ac9d-4db2-b474-b363c774bbb8': No scheme supplied. Perhaps you meant https:///api/products/72664cc8-ac9d-4db2-b474-b363c774bbb8?">backend/tests/test_products.py:158: in test_get_product_by_id
+    response = api_client.get(f"{BASE_URL}/api/products/{sample_product_id}")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
     return self.request("GET", url, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -560,7 +566,7 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/products/brands': No sc
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?</error></testcase><testcase classname="backend.tests.test_products.TestSingleProduct" name="test_get_product_not_found" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/products/non-existent-product-id-12345': No scheme supplied. Perhaps you meant https:///api/products/non-existent-product-id-12345?">backend/tests/test_products.py:175: in test_get_product_not_found
+E   requests.exceptions.MissingSchema: Invalid URL '/api/products/72664cc8-ac9d-4db2-b474-b363c774bbb8': No scheme supplied. Perhaps you meant https:///api/products/72664cc8-ac9d-4db2-b474-b363c774bbb8?</failure></testcase><testcase classname="backend.tests.test_products.TestSingleProduct" name="test_get_product_not_found" time="0.000"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/products/non-existent-product-id-12345': No scheme supplied. Perhaps you meant https:///api/products/non-existent-product-id-12345?">backend/tests/test_products.py:175: in test_get_product_not_found
     response = api_client.get(f"{BASE_URL}/api/products/{fake_id}")
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
@@ -575,9 +581,9 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': 
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/products/non-existent-product-id-12345': No scheme supplied. Perhaps you meant https:///api/products/non-existent-product-id-12345?</failure></testcase><testcase classname="backend.tests.test_products.TestProductReviews" name="test_get_product_reviews" time="0.000"><error message="failed on setup with &quot;requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?&quot;">backend/tests/conftest.py:75: in sample_product_id
-    response = session.get(f"{base_url}/api/products?page_size=1")
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   requests.exceptions.MissingSchema: Invalid URL '/api/products/non-existent-product-id-12345': No scheme supplied. Perhaps you meant https:///api/products/non-existent-product-id-12345?</failure></testcase><testcase classname="backend.tests.test_products.TestProductReviews" name="test_get_product_reviews" time="0.001"><failure message="requests.exceptions.MissingSchema: Invalid URL '/api/products/72664cc8-ac9d-4db2-b474-b363c774bbb8/reviews': No scheme supplied. Perhaps you meant https:///api/products/72664cc8-ac9d-4db2-b474-b363c774bbb8/reviews?">backend/tests/test_products.py:188: in test_get_product_reviews
+    response = api_client.get(f"{BASE_URL}/api/products/{sample_product_id}/reviews")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 /root/.venv/lib/python3.11/site-packages/requests/sessions.py:602: in get
     return self.request("GET", url, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -590,4 +596,4 @@ E   requests.exceptions.MissingSchema: Invalid URL '/api/products/non-existent-p
     self.prepare_url(url, params)
 /root/.venv/lib/python3.11/site-packages/requests/models.py:438: in prepare_url
     raise MissingSchema(
-E   requests.exceptions.MissingSchema: Invalid URL '/api/products?page_size=1': No scheme supplied. Perhaps you meant https:///api/products?page_size=1?</error></testcase></testsuite></testsuites>
+E   requests.exceptions.MissingSchema: Invalid URL '/api/products/72664cc8-ac9d-4db2-b474-b363c774bbb8/reviews': No scheme supplied. Perhaps you meant https:///api/products/72664cc8-ac9d-4db2-b474-b363c774bbb8/reviews?</failure></testcase></testsuite></testsuites>
