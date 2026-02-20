@@ -194,11 +194,11 @@ const AuthPage = () => {
     }
     
     try {
-      await login(identifier, loginData.password, loginMethod);
+      await login(identifier, loginData.password);
       toast.success('Welcome back!');
       navigate('/');
     } catch (error) {
-      toast.error('Login failed. Please try again.');
+      toast.error(error.message || 'Login failed. Please check your credentials.');
     }
   };
 
