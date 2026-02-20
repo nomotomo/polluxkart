@@ -21,8 +21,9 @@ Build a complete e-commerce platform named "PolluxKart" with:
 - **Stack**: FastAPI, Python 3.11, MongoDB (Motor async driver)
 - **Authentication**: JWT (python-jose) with role-based access (user/admin)
 - **Payment**: Razorpay integration with Cash on Delivery option
-- **Testing**: Pytest (47 tests)
-- **File Uploads**: Local async file uploads for product images (aiofiles)
+- **Testing**: Pytest (62 tests)
+- **File Uploads**: Cloudinary cloud storage (with local fallback via aiofiles)
+- **Image CDN**: Cloudinary for optimized image delivery
 
 ### Database (MongoDB)
 Collections:
