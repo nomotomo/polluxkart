@@ -147,7 +147,7 @@ class AdminService:
         }
         
         await self.db.categories.insert_one(category)
-        del category["_id"] if "_id" in category else None
+        category.pop("_id", None)
         return category
 
     async def update_category(self, category_id: str, update_data: CategoryUpdate) -> Optional[dict]:
