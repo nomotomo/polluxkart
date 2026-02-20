@@ -83,6 +83,12 @@ app.include_router(cart_router, prefix="/api")
 app.include_router(orders_router, prefix="/api")
 app.include_router(payments_router, prefix="/api")
 app.include_router(inventory_router, prefix="/api")
+app.include_router(admin_router, prefix="/api")
+
+# Serve uploaded images
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/api/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # Health check endpoint
 @app.get("/api/health")
