@@ -137,13 +137,15 @@ const CheckoutPage = () => {
       // Create order in backend
       const orderData = {
         shipping_address: {
-          name: selectedAddressData.name,
+          full_name: selectedAddressData.name,
           phone: selectedAddressData.phone,
-          street: selectedAddressData.street,
+          address_line1: selectedAddressData.street,
+          address_line2: '',
           city: selectedAddressData.city,
           state: selectedAddressData.state,
           pincode: selectedAddressData.pincode,
           country: 'India',
+          is_default: selectedAddressData.isDefault || false,
         },
         payment_method: paymentMethod === 'online' ? 'razorpay' : 'cod',
       };
