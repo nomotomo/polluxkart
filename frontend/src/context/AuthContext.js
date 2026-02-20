@@ -53,6 +53,7 @@ export const AuthProvider = ({ children }) => {
         email: response.user.email,
         phone: response.user.phone,
         avatar: response.user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${response.user.name}`,
+        role: response.user.role || 'user',
       };
       setUser(userData);
       return userData;
@@ -81,6 +82,7 @@ export const AuthProvider = ({ children }) => {
         email: response.user.email,
         phone: response.user.phone,
         avatar: response.user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${name}`,
+        role: response.user.role || 'user',
       };
       setUser(userData);
       return userData;

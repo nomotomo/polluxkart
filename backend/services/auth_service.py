@@ -83,6 +83,7 @@ class AuthService:
             name=user["name"],
             avatar=user.get("avatar", ""),
             is_active=user.get("is_active", True),
+            role=user.get("role", "user"),
         )
         
         return user_response, token

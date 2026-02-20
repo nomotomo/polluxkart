@@ -32,6 +32,7 @@ class UserResponse(BaseModel):
     avatar: str = "https://api.dicebear.com/7.x/avataaars/svg?seed=default"
     created_at: datetime = Field(default_factory=current_time)
     is_active: bool = True
+    role: str = "user"
 
 class UserInDB(UserResponse):
     password_hash: str
