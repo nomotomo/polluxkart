@@ -76,7 +76,14 @@ export const uploadMultipleImages = async (files, onProgress = null) => {
     throw new Error(error.detail || 'Upload failed');
   }
   
-  return await response.json();
+  const results = await response.json();
+  // Prepend base URL to local uploads
+  return results.map(result => {
+    if (result.url && result.url.startsWith('/api/')) {
+      result.url = `${API_CONFIG.baseUrl}${result.url}`;
+    }
+    return result;
+  });
 };
 
 // Products
