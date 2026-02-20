@@ -74,6 +74,7 @@ class AuthService:
             "sub": user["id"],
             "email": user.get("email"),
             "phone": user.get("phone"),
+            "role": user.get("role", "user"),
         })
         
         user_response = UserResponse(

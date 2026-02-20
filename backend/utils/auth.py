@@ -66,7 +66,7 @@ async def get_optional_user(credentials: HTTPAuthorizationCredentials = Depends(
         payload = decode_token(token)
         user_id = payload.get("sub")
         if user_id:
-            return {"user_id": user_id, "email": payload.get("email"), "phone": payload.get("phone")}
+            return {"user_id": user_id, "email": payload.get("email"), "phone": payload.get("phone"), "role": payload.get("role", "user")}
     except:
         pass
     
