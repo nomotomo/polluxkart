@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import logging
+import os
 
 from config.settings import settings
 from config.database import Database
@@ -9,6 +11,7 @@ from routes import (
     auth_router, products_router, cart_router, 
     orders_router, payments_router, inventory_router
 )
+from routes.admin import router as admin_router
 
 # Configure logging
 logging.basicConfig(
