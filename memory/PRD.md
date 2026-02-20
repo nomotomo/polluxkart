@@ -259,3 +259,23 @@ CLOUDINARY_API_SECRET=your_api_secret
 4. Restart the backend service
 
 Without these keys, image uploads will fall back to local storage.
+
+## Firebase Phone Auth Setup Instructions
+To enable real SMS OTP verification (10,000 free verifications/month):
+
+1. Create a Firebase project at https://console.firebase.google.com
+2. Go to Authentication > Sign-in method > Enable Phone
+3. Go to Project Settings > General > Add a web app
+4. Copy the configuration values and add to `/app/frontend/.env`:
+```
+REACT_APP_FIREBASE_API_KEY=AIzaSy...
+REACT_APP_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your-project-id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=123456789
+REACT_APP_FIREBASE_APP_ID=1:123456789:web:abc123
+```
+5. Add your domain to Firebase Console > Authentication > Settings > Authorized domains
+6. Restart the frontend service
+
+Without these keys, OTP will use mock mode (any 6-digit code works, use 123456).
