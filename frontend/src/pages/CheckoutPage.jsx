@@ -117,6 +117,24 @@ const CheckoutPage = () => {
   const tax = cartTotal * 0.18; // 18% GST
   const finalTotal = cartTotal + shipping + tax;
 
+  // Sync cart to backend before placing order
+  const syncCartToBackend = async () => {
+    if (!isAuthenticated || cartItems.length === 0) return;
+    
+    try {
+      // Clear backend cart first
+      await CartService.clearCart();
+      
+      // Add all items from local cart to backend
+      for (const item of cartItems) {
+        await CartService.addToCart(item.id, item.quantity);
+      }
+    } catch (error) {
+      console.error('Failed to sync cart:', error);
+      throw new Error('Failed to sync your cart. Please try again.');
+    }
+  };
+
   const handlePlaceOrder = async () => {
     if (!isAuthenticated) {
       toast.error('Please login to place an order');
@@ -132,6 +150,9 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
+      // Ensure cart is synced to backend before creating order
+      await syncCartToBackend();
+      
       const selectedAddressData = savedAddresses.find((a) => a.id === selectedAddress);
       
       // Create order in backend
