@@ -50,6 +50,7 @@ const AdminCategories = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
