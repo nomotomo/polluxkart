@@ -29,8 +29,8 @@ class TestAdminAuth:
         assert "role" in data["user"], "User response must include role field"
         assert data["user"]["role"] == "admin", f"Expected admin role, got {data['user'].get('role')}"
     
-    def test_admin_dashboard_stats_with_token(self, api_client):
-        """Test admin dashboard stats API with valid admin token"""
+    def test_admin_dashboard_with_token(self, api_client):
+        """Test admin dashboard API with valid admin token"""
         # First login as admin
         login_data = {
             "identifier": "test@polluxkart.com",
@@ -41,15 +41,15 @@ class TestAdminAuth:
         
         token = login_response.json()["access_token"]
         
-        # Request admin dashboard stats
+        # Request admin dashboard
         headers = {"Authorization": f"Bearer {token}"}
-        stats_response = api_client.get(f"{BASE_URL}/api/admin/stats", headers=headers)
+        dashboard_response = api_client.get(f"{BASE_URL}/api/admin/dashboard", headers=headers)
         
-        assert stats_response.status_code == 200, f"Admin stats failed: {stats_response.text}"
+        assert dashboard_response.status_code == 200, f"Admin dashboard failed: {dashboard_response.text}"
         
-        stats_data = stats_response.json()
-        # Verify stats structure - common dashboard fields
-        assert "total_products" in stats_data or "products" in stats_data or isinstance(stats_data, dict)
+        dashboard_data = dashboard_response.json()
+        # Verify dashboard structure
+        assert isinstance(dashboard_data, dict)
     
     def test_admin_products_endpoint_with_token(self, api_client):
         """Test that admin can access products list with token"""
@@ -103,8 +103,8 @@ class TestAdminAuth:
     
     def test_protected_endpoint_without_token_fails(self, api_client):
         """Test that protected admin endpoints fail without token"""
-        # Try to access admin stats without token
-        response = api_client.get(f"{BASE_URL}/api/admin/stats")
+        # Try to access admin dashboard without token
+        response = api_client.get(f"{BASE_URL}/api/admin/dashboard")
         
         # Should fail with 401 or 403
         assert response.status_code in [401, 403], f"Expected auth error, got {response.status_code}"
