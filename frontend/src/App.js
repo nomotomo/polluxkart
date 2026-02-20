@@ -14,6 +14,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import OrdersPage from './pages/OrdersPage';
 import WishlistPage from './pages/WishlistPage';
 import AuthPage from './pages/AuthPage';
+import ProtectedRoute from './components/admin/ProtectedRoute';
 
 // Admin Pages
 import {
@@ -35,8 +36,15 @@ function App() {
         <CartProvider>
           <WishlistProvider>
             <Routes>
-              {/* Admin Routes - No Header/Footer */}
-              <Route path="/admin" element={<AdminLayout />}>
+              {/* Admin Routes - Protected, No Header/Footer */}
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout />
+                  </ProtectedRoute>
+                }
+              >
                 <Route index element={<AdminDashboard />} />
                 <Route path="products" element={<AdminProducts />} />
                 <Route path="orders" element={<AdminOrders />} />
