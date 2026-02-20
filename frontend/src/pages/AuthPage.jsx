@@ -864,6 +864,9 @@ const AuthPage = () => {
           </div>
         </div>
       </div>
+      {/* reCAPTCHA containers for Firebase Phone Auth */}
+      <div id="recaptcha-login" style={{ position: 'absolute', left: '-9999px' }} />
+      <div id="recaptcha-signup" style={{ position: 'absolute', left: '-9999px' }} />
     </div>
   );
 };
