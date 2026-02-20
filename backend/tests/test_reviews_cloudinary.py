@@ -86,7 +86,8 @@ class TestProductReviews:
         review_data = {
             "rating": 4,
             "title": "TEST_Great Product",
-            "comment": "TEST_This is a test review from automated testing. Great quality!"
+            "comment": "TEST_This is a test review from automated testing. Great quality!",
+            "product_id": sample_product_id
         }
         
         response = authenticated_client.post(
