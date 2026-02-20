@@ -3,20 +3,20 @@ import { API_CONFIG, apiFetch } from './apiConfig';
 
 /**
  * Fetch all products with pagination, filtering, sorting, and search
- * @param {Object} params - Query parameters
- * @returns {Promise<{products: Array, total: number, page: number, page_size: number, total_pages: number}>}
  */
-export const getProducts = async ({
-  page = 1,
-  pageSize = 12,
-  categoryId = null,
-  brand = null,
-  search = null,
-  minPrice = null,
-  maxPrice = null,
-  sortBy = 'default',
-  inStockOnly = false,
-} = {}) => {
+export const getProducts = async (options = {}) => {
+  const {
+    page = 1,
+    pageSize = 12,
+    categoryId = null,
+    brand = null,
+    search = null,
+    minPrice = null,
+    maxPrice = null,
+    sortBy = 'default',
+    inStockOnly = false,
+  } = options;
+
   const params = new URLSearchParams();
   params.append('page', page.toString());
   params.append('page_size', pageSize.toString());
@@ -36,7 +36,6 @@ export const getProducts = async ({
       method: 'GET',
       includeAuth: false,
     });
-    
     return response;
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -46,8 +45,6 @@ export const getProducts = async ({
 
 /**
  * Fetch single product by ID
- * @param {string} id - Product ID
- * @returns {Promise<Object>}
  */
 export const getProductById = async (id) => {
   try {
@@ -63,7 +60,6 @@ export const getProductById = async (id) => {
 
 /**
  * Fetch all categories
- * @returns {Promise<Array>}
  */
 export const getCategories = async () => {
   try {
@@ -79,7 +75,6 @@ export const getCategories = async () => {
 
 /**
  * Fetch all brands
- * @returns {Promise<Array>}
  */
 export const getBrands = async () => {
   try {
@@ -95,10 +90,6 @@ export const getBrands = async () => {
 
 /**
  * Fetch reviews for a product
- * @param {string} productId - Product ID
- * @param {number} page - Page number
- * @param {number} pageSize - Items per page
- * @returns {Promise<Array>}
  */
 export const getProductReviews = async (productId, page = 1, pageSize = 10) => {
   const params = new URLSearchParams();
@@ -120,9 +111,6 @@ export const getProductReviews = async (productId, page = 1, pageSize = 10) => {
 
 /**
  * Add a review to a product
- * @param {string} productId - Product ID
- * @param {Object} reviewData - {rating, title?, comment?}
- * @returns {Promise<Object>}
  */
 export const addProductReview = async (productId, reviewData) => {
   try {
@@ -137,15 +125,7 @@ export const addProductReview = async (productId, reviewData) => {
 };
 
 // Legacy function names for backward compatibility
-export const getAllProducts = async (
-  page = 1,
-  size = 12,
-  brandId = null,
-  typeId = null,
-  sort = 'default',
-  search = null
-) => {
-  // Map old sort values to new API format
+export const getAllProducts = async (page = 1, size = 12, brandId = null, typeId = null, sort = 'default', search = null) => {
   const sortMap = {
     'default': 'default',
     'priceAsc': 'price_asc',
@@ -162,7 +142,6 @@ export const getAllProducts = async (
     sortBy: sortMap[sort] || sort,
   });
   
-  // Transform response to legacy format
   return {
     data: result.products,
     count: result.total,
@@ -171,7 +150,6 @@ export const getAllProducts = async (
 
 export const getAllBrands = async () => {
   const brands = await getBrands();
-  // Transform to legacy format with id/name
   return brands.map((brand, index) => ({
     id: brand,
     name: brand,
@@ -180,7 +158,6 @@ export const getAllBrands = async () => {
 
 export const getAllTypes = async () => {
   const categories = await getCategories();
-  // Transform to legacy format
   return categories.map(cat => ({
     id: cat.id,
     name: cat.name,
@@ -195,7 +172,6 @@ const ProductService = {
   getBrands,
   getProductReviews,
   addProductReview,
-  // Legacy methods
   getAllProducts,
   getAllBrands,
   getAllTypes,

@@ -14,14 +14,12 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    // Check localStorage for cached user data
     const savedUser = localStorage.getItem('polluxkart-user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Save user to localStorage whenever it changes
   useEffect(() => {
     if (user) {
       localStorage.setItem('polluxkart-user', JSON.stringify(user));
@@ -30,12 +28,10 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  // Check for existing token on mount
   useEffect(() => {
     const checkAuth = async () => {
       const token = getAuthToken();
       if (token && !user) {
-        // We have a token but no user data - try to restore from localStorage
         const savedUser = localStorage.getItem('polluxkart-user');
         if (savedUser) {
           setUser(JSON.parse(savedUser));
@@ -43,14 +39,12 @@ export const AuthProvider = ({ children }) => {
       }
       setIsLoading(false);
     };
-
     checkAuth();
   }, [user]);
 
   const login = useCallback(async (identifier, password) => {
     setIsLoading(true);
     setError(null);
-    
     try {
       const response = await AuthService.login(identifier, password);
       const userData = {
@@ -74,7 +68,6 @@ export const AuthProvider = ({ children }) => {
   const signup = useCallback(async (name, email, phone, password) => {
     setIsLoading(true);
     setError(null);
-    
     try {
       const response = await AuthService.register({
         name,
