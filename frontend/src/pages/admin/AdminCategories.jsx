@@ -209,8 +209,16 @@ const AdminCategories = () => {
                 <TableRow key={category.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Tag className="h-5 w-5 text-primary" />
+                      <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center">
+                        {category.image ? (
+                          <img
+                            src={category.image}
+                            alt={category.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Tag className="h-5 w-5 text-primary" />
+                        )}
                       </div>
                       <span className="font-medium">{category.name}</span>
                     </div>
