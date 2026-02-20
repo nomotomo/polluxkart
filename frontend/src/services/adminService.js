@@ -1,5 +1,6 @@
 // Admin Service - API integration for admin operations
 import { API_CONFIG, apiFetch } from './apiConfig';
+import CloudinaryService from './cloudinaryService';
 
 const ADMIN_BASE = '/admin';
 
@@ -8,8 +9,20 @@ export const getDashboardStats = async () => {
   return await apiFetch(`${ADMIN_BASE}/dashboard`, { method: 'GET' });
 };
 
-// Image Upload
-export const uploadImage = async (file) => {
+// Image Upload - Uses Cloudinary if configured, falls back to local
+export const uploadImage = async (file, onProgress = null) => {
+  try {
+    // Try Cloudinary first
+    const isCloudinaryReady = await CloudinaryService.isCloudinaryConfigured();
+    if (isCloudinaryReady) {
+      const result = await CloudinaryService.uploadImage(file, 'products', onProgress);
+      return { url: result.url, filename: result.publicId, size: result.size, content_type: `image/${result.format}` };
+    }
+  } catch (error) {
+    console.warn('Cloudinary upload failed, falling back to local:', error);
+  }
+  
+  // Fall back to local upload
   const formData = new FormData();
   formData.append('file', file);
   
@@ -29,7 +42,19 @@ export const uploadImage = async (file) => {
   return await response.json();
 };
 
-export const uploadMultipleImages = async (files) => {
+export const uploadMultipleImages = async (files, onProgress = null) => {
+  try {
+    // Try Cloudinary first
+    const isCloudinaryReady = await CloudinaryService.isCloudinaryConfigured();
+    if (isCloudinaryReady) {
+      const results = await CloudinaryService.uploadMultipleImages(files, 'products', onProgress);
+      return results.map(r => ({ url: r.url, filename: r.publicId, size: r.size, content_type: `image/${r.format}` }));
+    }
+  } catch (error) {
+    console.warn('Cloudinary upload failed, falling back to local:', error);
+  }
+  
+  // Fall back to local upload
   const formData = new FormData();
   files.forEach(file => formData.append('files', file));
   
