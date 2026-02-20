@@ -78,10 +78,11 @@ export const uploadMultipleImages = async (files, onProgress = null) => {
   }
   
   const results = await response.json();
-  // Prepend base URL to local uploads
+  // Prepend base URL to local uploads (use raw backend URL without /api suffix)
+  const backendBaseUrl = process.env.REACT_APP_BACKEND_URL || '';
   return results.map(result => {
     if (result.url && result.url.startsWith('/api/')) {
-      result.url = `${API_CONFIG.baseUrl}${result.url}`;
+      result.url = `${backendBaseUrl}${result.url}`;
     }
     return result;
   });
