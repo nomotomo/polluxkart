@@ -43,6 +43,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import OrderService from '../services/orderService';
 import PaymentService from '../services/paymentService';
+import CartService from '../services/cartService';
 import { formatPrice } from '../utils/currency';
 import { toast } from 'sonner';
 
