@@ -217,7 +217,7 @@ class AdminService:
         }
         
         await self.db.promotions.insert_one(promotion)
-        del promotion["_id"] if "_id" in promotion else None
+        promotion.pop("_id", None)
         return promotion
 
     async def update_promotion(self, promo_id: str, update_data: PromotionUpdate) -> Optional[dict]:
