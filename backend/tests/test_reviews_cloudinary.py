@@ -368,11 +368,11 @@ def api_client():
 def auth_token(api_client):
     """Get authentication token for admin user"""
     response = api_client.post(f"{BASE_URL}/api/auth/login", json={
-        "email": TEST_USER_EMAIL,
+        "identifier": TEST_USER_EMAIL,
         "password": TEST_USER_PASSWORD
     })
     if response.status_code == 200:
-        return response.json().get("token")
+        return response.json().get("access_token")
     pytest.skip(f"Authentication failed: {response.text}")
 
 
