@@ -5,6 +5,9 @@ import {
   Trash2,
   Loader2,
   Tag,
+  Upload,
+  X,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
