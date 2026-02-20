@@ -219,6 +219,9 @@ REACT_APP_FIREBASE_APP_ID=your-app-id
 - **Product Reviews UI**: Verified - form displays for logged-in users
 - **Cloudinary Integration**: Verified - graceful fallback to local uploads
 - **Firebase OTP**: Ready - graceful fallback to mock mode when not configured
+- **Image Uploads (Admin)**: Fixed - URLs now correctly include base URL
+- **Checkout Flow**: Fixed - cart syncs to backend before order creation
+- **Orders Page**: Fixed - loads orders from API instead of localStorage
 
 ## Next Steps (Backlog)
 
@@ -228,11 +231,15 @@ REACT_APP_FIREBASE_APP_ID=your-app-id
 - [x] ~~Admin route protection~~ ✅ COMPLETED
 - [x] ~~Product Reviews UI~~ ✅ COMPLETED
 - [x] ~~Cloud image storage (Cloudinary)~~ ✅ COMPLETED
+- [x] ~~Fix image upload URL issues~~ ✅ COMPLETED
+- [x] ~~Fix checkout 400 error (cart sync)~~ ✅ COMPLETED
+- [x] ~~Fix Orders page (API integration)~~ ✅ COMPLETED
 - [ ] Configure Razorpay live keys
 
 ### P1 - Important
 - [x] ~~Wire up admin panel forms~~ ✅ COMPLETED (Categories, Promotions already working)
 - [x] ~~Add real OTP service~~ ✅ COMPLETED (Firebase Phone Auth integrated)
+- [x] ~~Category image upload~~ ✅ COMPLETED (replaced URL input with upload)
 - [ ] Configure Cloudinary API keys for production
 - [ ] Configure Firebase API keys for production OTP
 - [ ] Configure SMTP for email notifications
