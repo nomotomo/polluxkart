@@ -193,14 +193,19 @@ RAZORPAY_KEY_SECRET=xxx  # Optional
 SMTP_HOST=smtp.gmail.com  # Optional
 SMTP_USER=xxx  # Optional
 SMTP_PASSWORD=xxx  # Optional
+CLOUDINARY_CLOUD_NAME=your_cloud_name  # Optional - for cloud image storage
+CLOUDINARY_API_KEY=your_api_key  # Optional
+CLOUDINARY_API_SECRET=your_api_secret  # Optional
 ```
 
 ## Test Results
-- **Backend Tests**: 47/47 passing (100%)
+- **Backend Tests**: 62/62 passing (100%)
 - **Frontend Integration**: All features tested and working
 - **Search Debounce**: Verified working with 500ms delay
 - **Admin Auth Flow**: Verified - non-admin users redirected to /auth
 - **Admin Products**: Verified - loads without 422 error (pageSize=50)
+- **Product Reviews UI**: Verified - form displays for logged-in users
+- **Cloudinary Integration**: Verified - graceful fallback to local uploads
 
 ## Next Steps (Backlog)
 
@@ -208,11 +213,13 @@ SMTP_PASSWORD=xxx  # Optional
 - [x] ~~Connect frontend to backend APIs~~ ✅ COMPLETED
 - [x] ~~Add admin panel for product management~~ ✅ COMPLETED
 - [x] ~~Admin route protection~~ ✅ COMPLETED
+- [x] ~~Product Reviews UI~~ ✅ COMPLETED
+- [x] ~~Cloud image storage (Cloudinary)~~ ✅ COMPLETED
 - [ ] Configure Razorpay live keys
 
 ### P1 - Important
-- [ ] Wire up admin panel forms to backend APIs (Add/Edit Product, Categories, etc.)
-- [ ] Implement Product Reviews UI (reviews API ready)
+- [x] ~~Wire up admin panel forms~~ ✅ COMPLETED (Categories, Promotions already working)
+- [ ] Configure Cloudinary API keys for production
 - [ ] Configure SMTP for email notifications
 - [ ] Add real OTP service (Twilio/AWS SNS)
 - [ ] Add order tracking with status updates
