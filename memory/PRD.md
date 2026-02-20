@@ -5,6 +5,7 @@ Build a complete e-commerce platform named "PolluxKart" with:
 - Frontend: React with tech-savvy, organic, fresh design
 - Backend: Microservice architecture with MongoDB
 - Features: Products, Cart, Checkout, Orders, Payments, Reviews, Wishlist, Inventory
+- Admin Panel: CRUD for Products, Categories, Promotions, Orders, Users
 
 ## Technical Architecture
 
@@ -18,28 +19,30 @@ Build a complete e-commerce platform named "PolluxKart" with:
 
 ### Backend (FastAPI)
 - **Stack**: FastAPI, Python 3.11, MongoDB (Motor async driver)
-- **Authentication**: JWT (python-jose)
-- **Payment**: Razorpay integration
-- **Testing**: Pytest (40 tests)
+- **Authentication**: JWT (python-jose) with role-based access (user/admin)
+- **Payment**: Razorpay integration with Cash on Delivery option
+- **Testing**: Pytest (47 tests)
+- **File Uploads**: Local async file uploads for product images (aiofiles)
 
 ### Database (MongoDB)
 Collections:
-- `users` - User accounts
-- `products` - Product catalog
+- `users` - User accounts with role field (user/admin)
+- `products` - Product catalog with multiple images
 - `categories` - Product categories
 - `carts` - Shopping carts
 - `wishlists` - User wishlists
-- `orders` - Order records
+- `orders` - Order records with shipping address
 - `payments` - Payment transactions
 - `inventory` - Stock management
 - `reviews` - Product reviews
 - `stock_movements` - Inventory audit trail
+- `promotions` - Discount codes and promotions
 
 ## API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login (email/phone)
+- `POST /api/auth/login` - Login (email/phone) - returns user with role
 
 ### Products
 - `GET /api/products` - List products (pagination, filter, sort, search)
@@ -78,9 +81,29 @@ Collections:
 - `POST /api/inventory/adjust` - Adjust stock (admin)
 - `GET /api/inventory/alerts/low-stock` - Low stock alerts (admin)
 
+### Admin (require admin role)
+- `GET /api/admin/dashboard` - Dashboard stats
+- `POST /api/admin/upload` - Upload image
+- `POST /api/admin/upload/multiple` - Upload multiple images
+- `POST /api/admin/products` - Create product
+- `PUT /api/admin/products/{id}` - Update product
+- `DELETE /api/admin/products/{id}` - Delete product
+- `GET /api/admin/categories` - Get all categories
+- `POST /api/admin/categories` - Create category
+- `PUT /api/admin/categories/{id}` - Update category
+- `DELETE /api/admin/categories/{id}` - Delete category
+- `GET /api/admin/promotions` - Get all promotions
+- `POST /api/admin/promotions` - Create promotion
+- `PUT /api/admin/promotions/{id}` - Update promotion
+- `DELETE /api/admin/promotions/{id}` - Delete promotion
+- `GET /api/admin/orders` - Get all orders
+- `PUT /api/admin/orders/{id}/status` - Update order status
+- `GET /api/admin/users` - Get all users
+- `PUT /api/admin/users/{id}/role` - Update user role
+
 ## Features Implemented
 
-### Frontend (December 2025)
+### Frontend (December 2025 - February 2026)
 - [x] All pages: Home, Store, Product, Cart, Checkout, Orders, Wishlist, Auth
 - [x] INR currency formatting (₹)
 - [x] Country code selector for phone auth
@@ -92,18 +115,22 @@ Collections:
 - [x] Unit tests (28 passing)
 - [x] GitHub Actions CI/CD
 - [x] **Frontend-Backend Integration - COMPLETED**
+- [x] **Admin Panel UI - COMPLETED** (Dashboard, Products, Orders, Users, Categories, Promotions)
+- [x] **Admin Route Protection - COMPLETED** (ProtectedRoute component)
 
-### Backend (December 2025)
-- [x] JWT Authentication
+### Backend (December 2025 - February 2026)
+- [x] JWT Authentication with role-based access (user/admin)
 - [x] Product CRUD with filtering, sorting, search
 - [x] Shopping cart management
 - [x] Wishlist sync
-- [x] Order management
-- [x] Razorpay payment integration
+- [x] Order management with shipping address
+- [x] Razorpay payment integration + Cash on Delivery
 - [x] Inventory management with stock movements
 - [x] Product reviews & ratings
 - [x] Email notifications (templates ready)
-- [x] Pytest tests (40 passing)
+- [x] Pytest tests (47 passing)
+- [x] **Admin APIs - COMPLETED** (Dashboard, Products, Categories, Promotions, Orders, Users)
+- [x] **Image Upload API - COMPLETED** (local async file uploads)
 
 ## Frontend-Backend Integration (December 2025)
 
@@ -159,26 +186,30 @@ SMTP_PASSWORD=xxx  # Optional
 ```
 
 ## Test Results
-- **Backend Tests**: 40/40 passing (100%)
+- **Backend Tests**: 47/47 passing (100%)
 - **Frontend Integration**: All features tested and working
 - **Search Debounce**: Verified working with 500ms delay
+- **Admin Auth Flow**: Verified - non-admin users redirected to /auth
+- **Admin Products**: Verified - loads without 422 error (pageSize=50)
 
 ## Next Steps (Backlog)
 
 ### P0 - Critical
 - [x] ~~Connect frontend to backend APIs~~ ✅ COMPLETED
+- [x] ~~Add admin panel for product management~~ ✅ COMPLETED
+- [x] ~~Admin route protection~~ ✅ COMPLETED
 - [ ] Configure Razorpay live keys
-- [ ] Add admin panel for product management
 
 ### P1 - Important
+- [ ] Wire up admin panel forms to backend APIs (Add/Edit Product, Categories, etc.)
+- [ ] Implement Product Reviews UI (reviews API ready)
 - [ ] Configure SMTP for email notifications
 - [ ] Add real OTP service (Twilio/AWS SNS)
 - [ ] Add order tracking with status updates
 - [ ] Add user profile/settings page
-- [ ] Implement product reviews UI (reviews API ready)
 
 ### P2 - Nice to Have
-- [ ] Add product image upload
+- [ ] Cloud image storage (S3/Cloudinary migration)
 - [ ] Add coupon/discount codes
 - [ ] Add order invoice PDF generation
 - [ ] Add social login (Google/Facebook)
