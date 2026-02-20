@@ -108,7 +108,7 @@ const AuthPage = () => {
     }
   };
 
-  // Send OTP (Mock)
+  // Send OTP using Firebase or Mock
   const sendOtp = async (phone, isLogin = true) => {
     if (!phone || phone.length < 7) {
       toast.error('Please enter a valid phone number');
@@ -117,24 +117,41 @@ const AuthPage = () => {
 
     setSendingOtp(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    const fullPhoneNumber = `${isLogin ? loginCountryCode : signupCountryCode}${phone}`;
+    const recaptchaId = isLogin ? 'recaptcha-login' : 'recaptcha-signup';
     
-    if (isLogin) {
-      setLoginOtpSent(true);
-      setLoginOtp(['', '', '', '', '', '']);
-      setLoginOtpVerified(false);
-    } else {
-      setSignupOtpSent(true);
-      setSignupOtp(['', '', '', '', '', '']);
-      setSignupOtpVerified(false);
+    try {
+      const result = await OTPService.sendOTP(fullPhoneNumber, recaptchaId);
+      
+      if (result.success) {
+        if (isLogin) {
+          setLoginOtpSent(true);
+          setLoginOtp(['', '', '', '', '', '']);
+          setLoginOtpVerified(false);
+        } else {
+          setSignupOtpSent(true);
+          setSignupOtp(['', '', '', '', '', '']);
+          setSignupOtpVerified(false);
+        }
+        
+        setOtpTimer(30);
+        
+        if (result.isMock) {
+          toast.success(`OTP sent to ${fullPhoneNumber}`, {
+            description: 'MOCK MODE: Use 123456 as OTP',
+          });
+        } else {
+          toast.success(`OTP sent to ${fullPhoneNumber}`);
+        }
+      } else {
+        toast.error(result.message || 'Failed to send OTP');
+      }
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      toast.error('Failed to send OTP. Please try again.');
+    } finally {
+      setSendingOtp(false);
     }
-    
-    setOtpTimer(30);
-    setSendingOtp(false);
-    toast.success(`OTP sent to ${isLogin ? loginCountryCode : signupCountryCode}${phone}`, {
-      description: `For testing, use: ${MOCK_OTP}`,
-    });
   };
 
   // Verify OTP (Mock)
