@@ -20,9 +20,10 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 import Logo from '../components/brand/Logo';
 import { countryCodes, getCountryByCode } from '../data/countryCodes';
+import OTPService from '../services/otpService';
 
-// Mock OTP verification - In production, this would call a real API
-const MOCK_OTP = '123456'; // For testing purposes
+// Check if Firebase OTP is available
+const isRealOTPAvailable = OTPService.isOTPServiceAvailable();
 
 const AuthPage = () => {
   const navigate = useNavigate();
