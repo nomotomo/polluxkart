@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   CreditCard,
-  Wallet,
-  MapPin,
   Truck,
+  MapPin,
   ShieldCheck,
   Check,
   Plus,
   ChevronRight,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -41,6 +41,9 @@ import {
 } from '../components/ui/accordion';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import OrderService from '../services/orderService';
+import PaymentService from '../services/paymentService';
+import { formatPrice } from '../utils/currency';
 import { toast } from 'sonner';
 
 const CheckoutPage = () => {
@@ -49,8 +52,9 @@ const CheckoutPage = () => {
   const { user, isAuthenticated } = useAuth();
   
   const [selectedAddress, setSelectedAddress] = useState('address1');
-  const [paymentMethod, setPaymentMethod] = useState('razorpay');
+  const [paymentMethod, setPaymentMethod] = useState('online');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const [newAddress, setNewAddress] = useState({
     name: '',
     phone: '',
@@ -60,59 +64,57 @@ const CheckoutPage = () => {
     pincode: '',
   });
 
+  // Load Razorpay script on mount
+  useEffect(() => {
+    const loadScript = async () => {
+      const loaded = await PaymentService.loadRazorpayScript();
+      setRazorpayLoaded(loaded);
+    };
+    loadScript();
+  }, []);
+
   // Mock saved addresses
   const savedAddresses = [
     {
       id: 'address1',
       name: user?.name || 'John Doe',
-      phone: '+1 234 567 890',
+      phone: '+91 98765 43210',
       street: '123 Main Street, Apt 4B',
-      city: 'New York',
-      state: 'NY',
-      pincode: '10001',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pincode: '400001',
       isDefault: true,
     },
     {
       id: 'address2',
       name: user?.name || 'John Doe',
-      phone: '+1 234 567 891',
+      phone: '+91 98765 43211',
       street: '456 Oak Avenue',
-      city: 'Los Angeles',
-      state: 'CA',
-      pincode: '90001',
+      city: 'Bangalore',
+      state: 'Karnataka',
+      pincode: '560001',
       isDefault: false,
     },
   ];
 
+  // Only 2 payment methods: Pay Online and Cash on Delivery
   const paymentMethods = [
     {
-      id: 'razorpay',
-      name: 'Razorpay',
-      description: 'Pay securely with Razorpay',
+      id: 'online',
+      name: 'Pay Online',
+      description: 'Pay securely via Razorpay (Cards, UPI, Net Banking)',
       icon: CreditCard,
-    },
-    {
-      id: 'card',
-      name: 'Credit/Debit Card',
-      description: 'Visa, Mastercard, Amex',
-      icon: CreditCard,
-    },
-    {
-      id: 'upi',
-      name: 'UPI',
-      description: 'Google Pay, PhonePe, Paytm',
-      icon: Wallet,
     },
     {
       id: 'cod',
       name: 'Cash on Delivery',
-      description: 'Pay when you receive',
+      description: 'Pay when you receive your order',
       icon: Truck,
     },
   ];
 
-  const shipping = cartTotal > 100 ? 0 : 9.99;
-  const tax = cartTotal * 0.08;
+  const shipping = cartTotal > 500 ? 0 : 49;
+  const tax = cartTotal * 0.18; // 18% GST
   const finalTotal = cartTotal + shipping + tax;
 
   const handlePlaceOrder = async () => {
@@ -122,32 +124,103 @@ const CheckoutPage = () => {
       return;
     }
 
+    if (cartItems.length === 0) {
+      toast.error('Your cart is empty');
+      return;
+    }
+
     setIsProcessing(true);
-    
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    
-    // Mock order creation
-    const orderId = `ORD-${Date.now()}`;
-    
-    // Save order to localStorage (mock)
-    const orders = JSON.parse(localStorage.getItem('polluxkart-orders') || '[]');
-    orders.push({
-      id: orderId,
-      items: cartItems,
-      total: finalTotal,
-      status: 'confirmed',
-      paymentMethod,
-      address: savedAddresses.find((a) => a.id === selectedAddress),
-      createdAt: new Date().toISOString(),
-    });
-    localStorage.setItem('polluxkart-orders', JSON.stringify(orders));
-    
-    clearCart();
-    setIsProcessing(false);
-    
-    toast.success('Order placed successfully!');
-    navigate('/orders');
+
+    try {
+      const selectedAddressData = savedAddresses.find((a) => a.id === selectedAddress);
+      
+      // Create order in backend
+      const orderData = {
+        shipping_address: {
+          name: selectedAddressData.name,
+          phone: selectedAddressData.phone,
+          street: selectedAddressData.street,
+          city: selectedAddressData.city,
+          state: selectedAddressData.state,
+          pincode: selectedAddressData.pincode,
+          country: 'India',
+        },
+        payment_method: paymentMethod === 'online' ? 'razorpay' : 'cod',
+      };
+
+      const order = await OrderService.createOrder(orderData);
+
+      if (paymentMethod === 'online') {
+        // Initiate Razorpay payment
+        await initiateRazorpayPayment(order);
+      } else {
+        // COD - Order is already created, just show success
+        clearCart();
+        toast.success('Order placed successfully! Pay on delivery.');
+        navigate('/orders');
+      }
+    } catch (error) {
+      console.error('Order error:', error);
+      toast.error(error.message || 'Failed to place order. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const initiateRazorpayPayment = async (order) => {
+    if (!razorpayLoaded) {
+      toast.error('Payment gateway is loading. Please try again.');
+      return;
+    }
+
+    try {
+      // Create Razorpay order
+      const razorpayOrder = await PaymentService.createRazorpayOrder(order.id);
+
+      // Open Razorpay checkout
+      const options = {
+        key: razorpayOrder.razorpay_key_id || 'rzp_test_placeholder',
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency || 'INR',
+        name: 'PolluxKart',
+        description: `Order #${order.order_number}`,
+        order_id: razorpayOrder.razorpay_order_id,
+        prefill: {
+          name: user?.name || '',
+          email: user?.email || '',
+          contact: user?.phone || '',
+        },
+        theme: {
+          color: '#14b8a6', // Teal color matching our theme
+        },
+        modal: {
+          ondismiss: () => {
+            toast.error('Payment cancelled');
+            setIsProcessing(false);
+          },
+        },
+      };
+
+      const paymentResponse = await PaymentService.openRazorpayCheckout(options);
+
+      // Verify payment
+      await PaymentService.verifyRazorpayPayment({
+        razorpay_order_id: paymentResponse.razorpay_order_id,
+        razorpay_payment_id: paymentResponse.razorpay_payment_id,
+        razorpay_signature: paymentResponse.razorpay_signature,
+        order_id: order.id,
+      });
+
+      // Payment successful
+      clearCart();
+      toast.success('Payment successful! Order confirmed.');
+      navigate('/orders');
+    } catch (error) {
+      console.error('Payment error:', error);
+      if (error.message !== 'Payment cancelled by user') {
+        toast.error('Payment failed. Please try again.');
+      }
+    }
   };
 
   if (cartItems.length === 0) {
@@ -280,7 +353,7 @@ const CheckoutPage = () => {
                           <Label htmlFor="phone">Phone Number</Label>
                           <Input
                             id="phone"
-                            placeholder="+1 234 567 890"
+                            placeholder="+91 98765 43210"
                             value={newAddress.phone}
                             onChange={(e) =>
                               setNewAddress({ ...newAddress, phone: e.target.value })
@@ -304,7 +377,7 @@ const CheckoutPage = () => {
                           <Label htmlFor="city">City</Label>
                           <Input
                             id="city"
-                            placeholder="New York"
+                            placeholder="Mumbai"
                             value={newAddress.city}
                             onChange={(e) =>
                               setNewAddress({ ...newAddress, city: e.target.value })
@@ -315,7 +388,7 @@ const CheckoutPage = () => {
                           <Label htmlFor="state">State</Label>
                           <Input
                             id="state"
-                            placeholder="NY"
+                            placeholder="Maharashtra"
                             value={newAddress.state}
                             onChange={(e) =>
                               setNewAddress({ ...newAddress, state: e.target.value })
@@ -326,7 +399,7 @@ const CheckoutPage = () => {
                           <Label htmlFor="pincode">PIN Code</Label>
                           <Input
                             id="pincode"
-                            placeholder="10001"
+                            placeholder="400001"
                             value={newAddress.pincode}
                             onChange={(e) =>
                               setNewAddress({ ...newAddress, pincode: e.target.value })
@@ -381,30 +454,31 @@ const CheckoutPage = () => {
                   ))}
                 </RadioGroup>
 
-                {/* Razorpay specific info */}
-                {paymentMethod === 'razorpay' && (
-                  <div className="mt-4 p-4 rounded-lg bg-muted/50">
-                    <p className="text-sm text-muted-foreground">
-                      You will be redirected to Razorpay's secure payment gateway to complete your payment.
-                    </p>
+                {/* Pay Online info */}
+                {paymentMethod === 'online' && (
+                  <div className="mt-4 p-4 rounded-lg bg-primary/5 border border-primary/20">
+                    <div className="flex items-start gap-3">
+                      <ShieldCheck className="h-5 w-5 text-primary mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Secure Payment via Razorpay</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          You'll be redirected to Razorpay's secure payment page to complete your payment using Credit/Debit Cards, UPI, Net Banking, or Wallets.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
 
-                {/* Card payment form */}
-                {paymentMethod === 'card' && (
-                  <div className="mt-4 space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="cardNumber">Card Number</Label>
-                      <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
-                    </div>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="col-span-2 space-y-2">
-                        <Label htmlFor="expiry">Expiry Date</Label>
-                        <Input id="expiry" placeholder="MM/YY" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="cvv">CVV</Label>
-                        <Input id="cvv" placeholder="123" type="password" />
+                {/* COD info */}
+                {paymentMethod === 'cod' && (
+                  <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-border">
+                    <div className="flex items-start gap-3">
+                      <Truck className="h-5 w-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Cash on Delivery</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Pay with cash when your order is delivered. Please keep exact change ready.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -445,7 +519,7 @@ const CheckoutPage = () => {
                               </p>
                               <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                               <p className="text-sm font-medium text-foreground">
-                                ${(item.price * item.quantity).toFixed(2)}
+                                {formatPrice(item.price * item.quantity)}
                               </p>
                             </div>
                           </div>
@@ -461,7 +535,7 @@ const CheckoutPage = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-medium">${cartTotal.toFixed(2)}</span>
+                    <span className="font-medium">{formatPrice(cartTotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Shipping</span>
@@ -469,13 +543,13 @@ const CheckoutPage = () => {
                       {shipping === 0 ? (
                         <span className="text-success">Free</span>
                       ) : (
-                        `$${shipping.toFixed(2)}`
+                        formatPrice(shipping)
                       )}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tax (8%)</span>
-                    <span className="font-medium">${tax.toFixed(2)}</span>
+                    <span className="text-muted-foreground">GST (18%)</span>
+                    <span className="font-medium">{formatPrice(tax)}</span>
                   </div>
                 </div>
 
@@ -484,7 +558,7 @@ const CheckoutPage = () => {
                 <div className="flex justify-between">
                   <span className="font-heading font-bold text-lg">Total</span>
                   <span className="font-heading font-bold text-lg text-primary">
-                    ${finalTotal.toFixed(2)}
+                    {formatPrice(finalTotal)}
                   </span>
                 </div>
 
@@ -493,11 +567,17 @@ const CheckoutPage = () => {
                   size="lg"
                   onClick={handlePlaceOrder}
                   disabled={isProcessing}
+                  data-testid="place-order-btn"
                 >
                   {isProcessing ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2" />
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
                       Processing...
+                    </>
+                  ) : paymentMethod === 'online' ? (
+                    <>
+                      Pay {formatPrice(finalTotal)}
+                      <ChevronRight className="ml-2 h-4 w-4" />
                     </>
                   ) : (
                     <>
