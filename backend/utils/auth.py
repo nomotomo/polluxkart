@@ -54,7 +54,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    return {"user_id": user_id, "email": payload.get("email"), "phone": payload.get("phone")}
+    return {"user_id": user_id, "email": payload.get("email"), "phone": payload.get("phone"), "role": payload.get("role", "user")}
 
 async def get_optional_user(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False))) -> dict:
     """Dependency to optionally get current user (for routes that work with or without auth)"""
