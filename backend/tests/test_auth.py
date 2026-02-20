@@ -37,12 +37,12 @@ class TestAuthRegister:
         assert isinstance(data["access_token"], str)
         assert len(data["access_token"]) > 0
     
-    def test_register_duplicate_phone_fails(self, api_client):
+    def test_register_duplicate_phone_fails(self, api_client, test_user_phone):
         """Test registration with duplicate phone fails"""
         unique_id = str(uuid.uuid4())[:8]
         user_data = {
             "email": f"TEST_dup_{unique_id}@polluxkart.com",
-            "phone": "+919999999999",  # Same as test user
+            "phone": test_user_phone,  # Same as test user
             "name": "Duplicate User",
             "password": "TestPass@123"
         }
@@ -87,10 +87,10 @@ class TestAuthLogin:
         assert "id" in data["user"]
         assert "name" in data["user"]
     
-    def test_login_with_phone_success(self, api_client):
+    def test_login_with_phone_success(self, api_client, test_user_phone):
         """Test successful login with phone number"""
         login_data = {
-            "identifier": "+919999999999",
+            "identifier": test_user_phone,
             "password": "Test@123"
         }
         

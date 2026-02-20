@@ -13,9 +13,9 @@ def base_url():
     """Return the base URL for API calls"""
     return BASE_URL
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def api_client():
-    """Shared requests session"""
+    """Shared requests session - function scope to avoid header pollution"""
     session = requests.Session()
     session.headers.update({"Content-Type": "application/json"})
     return session
@@ -29,9 +29,17 @@ def test_user_credentials():
     }
 
 @pytest.fixture(scope="session")
-def auth_token(api_client, base_url, test_user_credentials):
+def test_user_phone():
+    """Test user phone number"""
+    return "+919876543210"
+
+@pytest.fixture(scope="session")
+def auth_token(base_url, test_user_credentials):
     """Get authentication token for test user"""
-    response = api_client.post(
+    session = requests.Session()
+    session.headers.update({"Content-Type": "application/json"})
+    
+    response = session.post(
         f"{base_url}/api/auth/login",
         json=test_user_credentials
     )
@@ -40,25 +48,31 @@ def auth_token(api_client, base_url, test_user_credentials):
     # If login fails, try to register the user first
     register_data = {
         "email": "test@polluxkart.com",
-        "phone": "+919999999999",
+        "phone": "+919876543210",
         "name": "Test User",
         "password": "Test@123"
     }
-    reg_response = api_client.post(f"{base_url}/api/auth/register", json=register_data)
+    reg_response = session.post(f"{base_url}/api/auth/register", json=register_data)
     if reg_response.status_code in [200, 201]:
         return reg_response.json().get("access_token")
     pytest.skip("Authentication failed - skipping authenticated tests")
 
-@pytest.fixture(scope="session")
-def authenticated_client(api_client, auth_token):
-    """Session with auth header"""
-    api_client.headers.update({"Authorization": f"Bearer {auth_token}"})
-    return api_client
+@pytest.fixture(scope="function")
+def authenticated_client(auth_token):
+    """Session with auth header - function scope for clean state"""
+    session = requests.Session()
+    session.headers.update({
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {auth_token}"
+    })
+    return session
 
 @pytest.fixture(scope="session")
-def sample_product_id(api_client, base_url):
+def sample_product_id(base_url):
     """Get a sample product ID from the database"""
-    response = api_client.get(f"{base_url}/api/products?page_size=1")
+    session = requests.Session()
+    session.headers.update({"Content-Type": "application/json"})
+    response = session.get(f"{base_url}/api/products?page_size=1")
     if response.status_code == 200:
         products = response.json().get("products", [])
         if products:

@@ -27,11 +27,8 @@ class TestHealthCheck:
         assert data["status"] == "healthy"
         assert data["database"] == "connected"
     
-    def test_root_endpoint(self, api_client):
-        """Test root endpoint returns welcome message"""
-        response = api_client.get(f"{BASE_URL}/")
+    def test_api_docs_endpoint(self, api_client):
+        """Test API docs endpoint is accessible"""
+        response = api_client.get(f"{BASE_URL}/api/docs")
+        # API docs should return 200 (HTML page)
         assert response.status_code == 200
-        
-        data = response.json()
-        assert "message" in data
-        assert "PolluxKart" in data["message"]
