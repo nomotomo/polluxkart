@@ -193,12 +193,13 @@ const AuthPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     
-    if (loginMethod === 'phone') {
-      if (!loginOtpVerified) {
-        toast.error('Please verify your phone number first');
-        return;
-      }
-    }
+    // OTP verification disabled - will be enabled when SMS service is integrated
+    // if (loginMethod === 'phone') {
+    //   if (!loginOtpVerified) {
+    //     toast.error('Please verify your phone number first');
+    //     return;
+    //   }
+    // }
     
     const identifier = loginMethod === 'email' ? loginData.email : `${loginCountryCode}${loginData.phone}`;
     
@@ -234,10 +235,11 @@ const AuthPage = () => {
       return;
     }
     
-    if (!signupOtpVerified) {
-      toast.error('Please verify your phone number first');
-      return;
-    }
+    // OTP verification disabled - will be enabled when SMS service is integrated
+    // if (!signupOtpVerified) {
+    //   toast.error('Please verify your phone number first');
+    //   return;
+    // }
     
     // Validate email if provided
     if (signupData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupData.email)) {
