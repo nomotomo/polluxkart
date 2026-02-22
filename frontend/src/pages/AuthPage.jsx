@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, Phone, ChevronDown, Loader2, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, Phone, ChevronDown, Loader2, CheckCircle2, KeyRound } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -15,12 +15,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '../components/ui/dialog';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 import Logo from '../components/brand/Logo';
 import { countryCodes, getCountryByCode } from '../data/countryCodes';
 import OTPService from '../services/otpService';
+import { apiFetch } from '../services/apiConfig';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -29,6 +37,16 @@ const AuthPage = () => {
   const [loginMethod, setLoginMethod] = useState('email');
   const [loginCountryCode, setLoginCountryCode] = useState('+91');
   const [signupCountryCode, setSignupCountryCode] = useState('+91');
+  
+  // Forgot Password States
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordData, setForgotPasswordData] = useState({
+    identifier: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [resettingPassword, setResettingPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   
   // OTP States
   const [loginOtpSent, setLoginOtpSent] = useState(false);
