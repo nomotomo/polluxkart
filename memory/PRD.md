@@ -129,6 +129,7 @@ Collections:
 - [x] **Admin Route Protection - COMPLETED** (ProtectedRoute component)
 - [x] **Product Reviews UI - COMPLETED** (ReviewForm component with star ratings)
 - [x] **Cloudinary Integration - COMPLETED** (with local upload fallback)
+- [x] **Clean Database Button - COMPLETED** (Admin Dashboard with confirmation dialog)
 
 ### Backend (December 2025 - February 2026)
 - [x] JWT Authentication with role-based access (user/admin)
@@ -144,6 +145,8 @@ Collections:
 - [x] **Admin APIs - COMPLETED** (Dashboard, Products, Categories, Promotions, Orders, Users)
 - [x] **Image Upload API - COMPLETED** (Cloudinary + local fallback)
 - [x] **Cloudinary Integration - COMPLETED** (signed upload flow)
+- [x] **Initial Admin Setup Endpoint - COMPLETED** (One-time use for production)
+- [x] **Database Cleanup API - COMPLETED** (Remove seed data while preserving users)
 
 ## Frontend-Backend Integration (December 2025)
 
