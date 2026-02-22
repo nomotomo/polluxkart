@@ -1,6 +1,7 @@
 # Admin Routes
 from fastapi import APIRouter, HTTPException, status, Depends, Query, UploadFile, File
 from typing import Optional, List
+from pydantic import BaseModel, EmailStr
 from models.admin import (
     DashboardStats, PromotionCreate, PromotionResponse, PromotionUpdate,
     ProductCreate, ProductUpdate, CategoryCreate, CategoryUpdate,
@@ -8,18 +9,123 @@ from models.admin import (
 )
 from models.order import OrderStatus
 from services.admin_service import AdminService
-from utils.auth import get_current_user
+from utils.auth import get_current_user, hash_password
+from config.database import get_db
 import os
 import uuid
 import aiofiles
-from datetime import datetime
+from datetime import datetime, timezone
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 admin_service = AdminService()
 
+# Model for initial admin setup
+class InitialAdminCreate(BaseModel):
+    email: EmailStr
+    phone: str
+    name: str
+    password: str
+    setup_key: str  # Secret key for extra security
+
 # Upload directory
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Secret key for initial admin setup (should match in production)
+ADMIN_SETUP_KEY = os.environ.get("ADMIN_SETUP_KEY", "POLLUXKART_INITIAL_ADMIN_2025")
+
+# ===============================================
+# INITIAL ADMIN SETUP - ONE TIME USE ONLY
+# ===============================================
+@router.post("/setup/initial-admin", status_code=status.HTTP_201_CREATED)
+async def create_initial_admin(admin_data: InitialAdminCreate):
+    """
+    Create the first admin user for a fresh production deployment.
+    
+    This endpoint ONLY works when:
+    1. There are NO existing admin users in the database
+    2. The correct setup_key is provided
+    
+    After the first admin is created, this endpoint becomes permanently disabled.
+    """
+    db = get_db()
+    
+    # Verify setup key
+    if admin_data.setup_key != ADMIN_SETUP_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid setup key. This endpoint is protected."
+        )
+    
+    # Check if any admin already exists
+    existing_admin = await db.users.find_one({"role": {"$in": ["admin", "super_admin"]}})
+    if existing_admin:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="An admin user already exists. This endpoint can only be used once for initial setup."
+        )
+    
+    # Check if email or phone already exists
+    existing_user = await db.users.find_one({
+        "$or": [
+            {"email": admin_data.email},
+            {"phone": admin_data.phone}
+        ]
+    })
+    
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A user with this email or phone already exists."
+        )
+    
+    # Create the admin user
+    user_id = str(uuid.uuid4())
+    admin_user = {
+        "id": user_id,
+        "email": admin_data.email,
+        "phone": admin_data.phone,
+        "name": admin_data.name,
+        "password_hash": hash_password(admin_data.password),
+        "avatar": f"https://api.dicebear.com/7.x/avataaars/svg?seed={user_id}",
+        "is_active": True,
+        "role": "admin",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    
+    await db.users.insert_one(admin_user)
+    
+    return {
+        "message": "Initial admin user created successfully",
+        "user": {
+            "id": user_id,
+            "email": admin_data.email,
+            "phone": admin_data.phone,
+            "name": admin_data.name,
+            "role": "admin"
+        },
+        "note": "This endpoint is now disabled. No more admins can be created through this endpoint."
+    }
+
+# ===============================================
+# CHECK IF INITIAL SETUP IS NEEDED
+# ===============================================
+@router.get("/setup/status")
+async def check_setup_status():
+    """
+    Check if the initial admin setup has been completed.
+    Returns whether an admin exists and if setup is still possible.
+    """
+    db = get_db()
+    
+    # Check if any admin exists
+    admin_count = await db.users.count_documents({"role": {"$in": ["admin", "super_admin"]}})
+    
+    return {
+        "admin_exists": admin_count > 0,
+        "setup_available": admin_count == 0,
+        "message": "Initial admin setup is complete" if admin_count > 0 else "No admin exists. Initial setup endpoint is available."
+    }
 
 # Middleware to check admin role
 async def require_admin(current_user: dict = Depends(get_current_user)):
