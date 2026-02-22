@@ -54,15 +54,6 @@ const Header = () => {
     loadCategories();
   }, []);
 
-const Header = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const { cartCount } = useCart();
-  const { wishlistCount } = useWishlist();
-  const { user, isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
