@@ -347,7 +347,7 @@ const Header = () => {
                         categories.map((category) => (
                           <Link
                             key={category.id || category.name}
-                            to={`/store?category=${category.name}`}
+                            to={`/store?category=${category.id}`}
                             className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary p-2 rounded-md hover:bg-muted transition-colors"
                           >
                             <span>{getCategoryIcon(category.name)}</span>
