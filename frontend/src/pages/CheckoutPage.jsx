@@ -202,14 +202,14 @@ const CheckoutPage = () => {
       const razorpayOrder = await PaymentService.createRazorpayOrder(order.id);
       
       // Check if Razorpay is properly configured
-      if (!razorpayOrder.razorpay_key_id || razorpayOrder.razorpay_key_id === 'rzp_test_placeholder') {
+      if (!razorpayOrder.key_id || razorpayOrder.key_id === 'rzp_test_mock') {
         toast.error('Payment gateway not configured. Please use Cash on Delivery.');
         return;
       }
 
       // Open Razorpay checkout
       const options = {
-        key: razorpayOrder.razorpay_key_id,
+        key: razorpayOrder.key_id,
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency || 'INR',
         name: 'PolluxKart',
