@@ -477,84 +477,18 @@ const AuthPage = () => {
                               className="rounded-l-none"
                               maxLength={loginCountry.maxLength}
                               data-testid="login-phone-input"
-                              disabled={loginOtpVerified}
+                              disabled={false}
                             />
                           </div>
                           
-                          {/* OTP Section for Login */}
+                          {/* OTP Section disabled - will be enabled when SMS service is integrated */}
+                          {/* 
                           {!loginOtpVerified && (
                             <div className="space-y-3">
-                              {!loginOtpSent ? (
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  className="w-full"
-                                  onClick={() => sendOtp(loginData.phone, true)}
-                                  disabled={sendingOtp || loginData.phone.length < 7}
-                                  data-testid="login-send-otp-btn"
-                                >
-                                  {sendingOtp ? (
-                                    <>
-                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                      Sending OTP...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Phone className="mr-2 h-4 w-4" />
-                                      Send OTP
-                                    </>
-                                  )}
-                                </Button>
-                              ) : (
-                                <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
-                                  <p className="text-sm text-center text-muted-foreground">
-                                    Enter 6-digit OTP sent to {loginCountryCode}{loginData.phone}
-                                  </p>
-                                  {renderOtpInputs(loginOtp, setLoginOtp, loginOtpRefs, verifyingOtp, 'login-otp')}
-                                  <Button
-                                    type="button"
-                                    className="w-full"
-                                    onClick={() => verifyOtp(loginOtp, true)}
-                                    disabled={verifyingOtp || loginOtp.join('').length !== 6}
-                                    data-testid="login-verify-otp-btn"
-                                  >
-                                    {verifyingOtp ? (
-                                      <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Verifying...
-                                      </>
-                                    ) : (
-                                      'Verify OTP'
-                                    )}
-                                  </Button>
-                                  <div className="text-center">
-                                    {otpTimer > 0 ? (
-                                      <p className="text-sm text-muted-foreground">
-                                        Resend OTP in {otpTimer}s
-                                      </p>
-                                    ) : (
-                                      <Button
-                                        type="button"
-                                        variant="link"
-                                        className="text-sm p-0 h-auto"
-                                        onClick={() => sendOtp(loginData.phone, true)}
-                                        disabled={sendingOtp}
-                                      >
-                                        Resend OTP
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
+                              ...OTP UI...
                             </div>
                           )}
-                          
-                          {loginOtpVerified && (
-                            <div className="flex items-center gap-2 text-success text-sm">
-                              <CheckCircle2 className="h-4 w-4" />
-                              Phone number verified
-                            </div>
-                          )}
+                          */}
                         </div>
                       )}
 
