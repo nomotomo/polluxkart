@@ -192,17 +192,6 @@ const CheckoutPage = () => {
   };
 
   const initiateRazorpayPayment = async (order) => {
-    // Check if running on localhost - skip Razorpay and simulate success
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    
-    if (isLocalhost) {
-      // Simulate successful payment for local development
-      toast.success('Local mode: Payment simulated as successful!');
-      clearCart();
-      navigate('/orders');
-      return;
-    }
-
     if (!razorpayLoaded) {
       toast.error('Payment gateway is loading. Please try again.');
       return;
@@ -211,10 +200,16 @@ const CheckoutPage = () => {
     try {
       // Create Razorpay order
       const razorpayOrder = await PaymentService.createRazorpayOrder(order.id);
+      
+      // Check if Razorpay is properly configured
+      if (!razorpayOrder.razorpay_key_id || razorpayOrder.razorpay_key_id === 'rzp_test_placeholder') {
+        toast.error('Payment gateway not configured. Please use Cash on Delivery.');
+        return;
+      }
 
       // Open Razorpay checkout
       const options = {
-        key: razorpayOrder.razorpay_key_id || 'rzp_test_placeholder',
+        key: razorpayOrder.razorpay_key_id,
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency || 'INR',
         name: 'PolluxKart',
@@ -228,6 +223,24 @@ const CheckoutPage = () => {
         theme: {
           color: '#14b8a6', // Teal color matching our theme
         },
+        handler: async function (response) {
+          // Payment successful - verify on backend
+          try {
+            await PaymentService.verifyRazorpayPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              order_id: order.id,
+            });
+
+            clearCart();
+            toast.success('Payment successful! Order confirmed.');
+            navigate('/orders');
+          } catch (verifyError) {
+            console.error('Payment verification error:', verifyError);
+            toast.error('Payment verification failed. Please contact support.');
+          }
+        },
         modal: {
           ondismiss: () => {
             toast.error('Payment cancelled');
@@ -236,25 +249,18 @@ const CheckoutPage = () => {
         },
       };
 
-      const paymentResponse = await PaymentService.openRazorpayCheckout(options);
-
-      // Verify payment
-      await PaymentService.verifyRazorpayPayment({
-        razorpay_order_id: paymentResponse.razorpay_order_id,
-        razorpay_payment_id: paymentResponse.razorpay_payment_id,
-        razorpay_signature: paymentResponse.razorpay_signature,
-        order_id: order.id,
+      // Open Razorpay checkout modal
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response) {
+        console.error('Payment failed:', response.error);
+        toast.error(response.error.description || 'Payment failed. Please try again.');
+        setIsProcessing(false);
       });
-
-      // Payment successful
-      clearCart();
-      toast.success('Payment successful! Order confirmed.');
-      navigate('/orders');
+      rzp.open();
     } catch (error) {
       console.error('Payment error:', error);
-      if (error.message !== 'Payment cancelled by user') {
-        toast.error('Payment failed. Please try again.');
-      }
+      toast.error(error.message || 'Failed to initiate payment. Please try again.');
+      setIsProcessing(false);
     }
   };
 
