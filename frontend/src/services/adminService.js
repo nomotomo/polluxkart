@@ -203,6 +203,13 @@ export const updateUserRole = async (userId, role) => {
   });
 };
 
+// Database Cleanup
+export const cleanSeedData = async () => {
+  return await apiFetch(`${ADMIN_BASE}/cleanup/seed-data?confirm=CONFIRM`, {
+    method: 'DELETE',
+  });
+};
+
 const AdminService = {
   getDashboardStats,
   uploadImage,
@@ -223,6 +230,7 @@ const AdminService = {
   updateOrderStatus,
   getAdminUsers,
   updateUserRole,
+  cleanSeedData,
 };
 
 export default AdminService;
