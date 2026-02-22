@@ -100,34 +100,24 @@ class OrderService:
         
         await self.orders.insert_one(order_dict)
         
-        # Batch reserve inventory using bulkWrite (avoid N+1)
-        bulk_ops = []
+        # Reserve inventory for each item
         for item in cart.items:
-            bulk_ops.append({
-                "updateOne": {
-                    "filter": {"product_id": item.product_id},
-                    "update": {"$inc": {"reserved": item.quantity}}
-                }
-            })
-        
-        if bulk_ops:
-            await self.db[COLLECTIONS['inventory']].bulk_write(bulk_ops)
+            await self.db[COLLECTIONS['inventory']].update_one(
+                {"product_id": item.product_id},
+                {"$inc": {"reserved": item.quantity}}
+            )
             
-            # Record stock movements
-            movements = []
-            for item in cart.items:
-                movements.append({
-                    "id": str(uuid.uuid4()),
-                    "product_id": item.product_id,
-                    "type": "reserve",
-                    "quantity": item.quantity,
-                    "reference_id": order_id,
-                    "reference_type": "order",
-                    "notes": f"Reserved for order {order_number}",
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                })
-            if movements:
-                await self.db[COLLECTIONS['stock_movements']].insert_many(movements)
+            # Record stock movement
+            await self.db[COLLECTIONS['stock_movements']].insert_one({
+                "id": str(uuid.uuid4()),
+                "product_id": item.product_id,
+                "type": "reserve",
+                "quantity": item.quantity,
+                "reference_id": order_id,
+                "reference_type": "order",
+                "notes": f"Reserved for order {order_number}",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            })
         
         return OrderResponse(**order_dict)
     
