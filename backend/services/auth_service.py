@@ -115,3 +115,34 @@ class AuthService:
             return None
         
         return await self.get_user_by_id(user_id)
+
+    async def reset_password(self, identifier: str, new_password: str) -> bool:
+        """Reset user password by email or phone"""
+        # Find user by email or phone
+        user = await self.collection.find_one({
+            "$or": [
+                {"email": identifier},
+                {"phone": identifier}
+            ]
+        })
+        
+        if not user:
+            raise ValueError("No account found with this email or phone number")
+        
+        # Update password
+        new_password_hash = hash_password(new_password)
+        
+        result = await self.collection.update_one(
+            {"id": user["id"]},
+            {
+                "$set": {
+                    "password_hash": new_password_hash,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        if result.modified_count == 0:
+            raise ValueError("Failed to update password")
+        
+        return True
