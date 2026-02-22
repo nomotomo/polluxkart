@@ -611,84 +611,18 @@ const AuthPage = () => {
                             className="rounded-l-none"
                             maxLength={signupCountry.maxLength}
                             data-testid="signup-phone-input"
-                            disabled={signupOtpVerified}
+                            disabled={false}
                           />
                         </div>
                         
-                        {/* OTP Section for Signup */}
+                        {/* OTP Section disabled - will be enabled when SMS service is integrated */}
+                        {/* 
                         {!signupOtpVerified && (
                           <div className="space-y-3">
-                            {!signupOtpSent ? (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                className="w-full"
-                                onClick={() => sendOtp(signupData.phone, false)}
-                                disabled={sendingOtp || signupData.phone.length < 7}
-                                data-testid="signup-send-otp-btn"
-                              >
-                                {sendingOtp ? (
-                                  <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Sending OTP...
-                                  </>
-                                ) : (
-                                  <>
-                                    <Phone className="mr-2 h-4 w-4" />
-                                    Verify Phone Number
-                                  </>
-                                )}
-                              </Button>
-                            ) : (
-                              <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
-                                <p className="text-sm text-center text-muted-foreground">
-                                  Enter 6-digit OTP sent to {signupCountryCode}{signupData.phone}
-                                </p>
-                                {renderOtpInputs(signupOtp, setSignupOtp, signupOtpRefs, verifyingOtp, 'signup-otp')}
-                                <Button
-                                  type="button"
-                                  className="w-full"
-                                  onClick={() => verifyOtp(signupOtp, false)}
-                                  disabled={verifyingOtp || signupOtp.join('').length !== 6}
-                                  data-testid="signup-verify-otp-btn"
-                                >
-                                  {verifyingOtp ? (
-                                    <>
-                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                      Verifying...
-                                    </>
-                                  ) : (
-                                    'Verify OTP'
-                                  )}
-                                </Button>
-                                <div className="text-center">
-                                  {otpTimer > 0 ? (
-                                    <p className="text-sm text-muted-foreground">
-                                      Resend OTP in {otpTimer}s
-                                    </p>
-                                  ) : (
-                                    <Button
-                                      type="button"
-                                      variant="link"
-                                      className="text-sm p-0 h-auto"
-                                      onClick={() => sendOtp(signupData.phone, false)}
-                                      disabled={sendingOtp}
-                                    >
-                                      Resend OTP
-                                    </Button>
-                                  )}
-                                </div>
-                              </div>
-                            )}
+                            ...OTP UI...
                           </div>
                         )}
-                        
-                        {signupOtpVerified && (
-                          <div className="flex items-center gap-2 text-success text-sm">
-                            <CheckCircle2 className="h-4 w-4" />
-                            Phone number verified
-                          </div>
-                        )}
+                        */}
                       </div>
 
                       <div className="space-y-2">
