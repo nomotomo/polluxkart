@@ -219,6 +219,70 @@ const AdminDashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Database Management */}
+      <Card className="mt-6 border-red-200">
+        <CardHeader>
+          <CardTitle className="text-red-700 flex items-center gap-2">
+            <Trash2 className="h-5 w-5" />
+            Database Management
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-gray-600 mb-4">
+            Remove all seed/test data from the database. This will delete all products, categories, 
+            orders, and other data except user accounts. Use this to clean up the database after testing.
+          </p>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="destructive" 
+                className="gap-2"
+                data-testid="clean-database-btn"
+              >
+                <Trash2 className="h-4 w-4" />
+                Clean Database
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete all:
+                  <ul className="list-disc ml-6 mt-2 space-y-1">
+                    <li>Products</li>
+                    <li>Categories</li>
+                    <li>Orders</li>
+                    <li>Reviews</li>
+                    <li>Carts & Wishlists</li>
+                    <li>Promotions</li>
+                    <li>Inventory data</li>
+                  </ul>
+                  <p className="mt-2 font-semibold">User accounts will be preserved.</p>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleCleanDatabase}
+                  disabled={isCleaningDb}
+                  className="bg-red-600 hover:bg-red-700"
+                  data-testid="confirm-clean-database-btn"
+                >
+                  {isCleaningDb ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Cleaning...
+                    </>
+                  ) : (
+                    'Yes, Clean Database'
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </CardContent>
+      </Card>
     </div>
   );
 };
