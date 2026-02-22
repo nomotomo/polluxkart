@@ -13,6 +13,7 @@ from routes import (
 )
 from routes.admin import router as admin_router
 from routes.cloudinary_upload import router as cloudinary_router
+from routes.otp import router as otp_router
 
 # Configure logging
 logging.basicConfig(
