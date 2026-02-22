@@ -22,9 +22,6 @@ import Logo from '../components/brand/Logo';
 import { countryCodes, getCountryByCode } from '../data/countryCodes';
 import OTPService from '../services/otpService';
 
-// Check if Firebase OTP is available
-const isRealOTPAvailable = OTPService.isOTPServiceAvailable();
-
 const AuthPage = () => {
   const navigate = useNavigate();
   const { login, signup, isLoading } = useAuth();
