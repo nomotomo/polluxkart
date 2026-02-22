@@ -135,44 +135,45 @@ const Header = () => {
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <div className="w-[500px] p-4" data-testid="categories-nav-content">
-                      <div className="grid grid-cols-2 gap-3">
-                        {categories.map((category) => (
-                          <NavigationMenuLink key={category.id} asChild>
-                            <Link
-                              to={`/store?category=${category.id}`}
-                              className="group flex items-start gap-3 rounded-lg p-3 hover:bg-muted transition-colors"
-                              data-testid={`nav-category-${category.id}`}
-                            >
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xl">
-                                {categoryIcons[category.id] || '📦'}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="font-medium text-sm text-foreground group-hover:text-primary transition-colors">
-                                  {category.name}
-                                </div>
-                                <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
-                                  {category.description}
-                                </p>
-                                <div className="flex flex-wrap gap-1 mt-1.5">
-                                  {category.subcategories?.slice(0, 2).map((sub) => (
-                                    <span 
-                                      key={sub.id}
-                                      className="text-[10px] px-1.5 py-0.5 bg-muted rounded text-muted-foreground"
-                                    >
-                                      {sub.name}
-                                    </span>
-                                  ))}
-                                  {category.subcategories?.length > 2 && (
-                                    <span className="text-[10px] px-1.5 py-0.5 text-primary">
-                                      +{category.subcategories.length - 2} more
-                                    </span>
+                      {categoriesLoading ? (
+                        <div className="flex items-center justify-center py-8">
+                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        </div>
+                      ) : categories.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          No categories available
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-3">
+                          {categories.map((category) => (
+                            <NavigationMenuLink key={category.id || category.name} asChild>
+                              <Link
+                                to={`/store?category=${category.name}`}
+                                className="group flex items-start gap-3 rounded-lg p-3 hover:bg-muted transition-colors"
+                                data-testid={`nav-category-${category.id || category.name}`}
+                              >
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xl">
+                                  {category.image ? (
+                                    <img src={category.image} alt={category.name} className="h-6 w-6 object-cover rounded" />
+                                  ) : (
+                                    getCategoryIcon(category.name)
                                   )}
                                 </div>
-                              </div>
-                            </Link>
-                          </NavigationMenuLink>
-                        ))}
-                      </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-medium text-sm text-foreground group-hover:text-primary transition-colors">
+                                    {category.name}
+                                  </div>
+                                  {category.description && (
+                                    <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                                      {category.description}
+                                    </p>
+                                  )}
+                                </div>
+                              </Link>
+                            </NavigationMenuLink>
+                          ))}
+                        </div>
+                      )}
                       <div className="mt-3 pt-3 border-t">
                         <Link
                           to="/store"
