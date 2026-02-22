@@ -31,6 +31,7 @@ import { toast } from 'sonner';
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCleaningDb, setIsCleaningDb] = useState(false);
 
   useEffect(() => {
     loadStats();
@@ -45,6 +46,22 @@ const AdminDashboard = () => {
       console.error(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleCleanDatabase = async () => {
+    setIsCleaningDb(true);
+    try {
+      const result = await AdminService.cleanSeedData();
+      toast.success('Database cleaned successfully!');
+      console.log('Cleanup result:', result);
+      // Reload stats after cleanup
+      await loadStats();
+    } catch (error) {
+      toast.error(error.message || 'Failed to clean database');
+      console.error('Cleanup error:', error);
+    } finally {
+      setIsCleaningDb(false);
     }
   };
 
