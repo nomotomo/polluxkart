@@ -98,7 +98,18 @@ export const apiFetch = async (endpoint, options = {}) => {
       return null;
     }
     
-    const data = await response.json();
+    // Clone response to avoid "Body is disturbed or locked" error
+    const responseClone = response.clone();
+    
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      // If JSON parsing fails, try to get text from cloned response
+      const text = await responseClone.text();
+      console.error('Failed to parse JSON response:', text);
+      throw new Error('Invalid server response');
+    }
     
     if (!response.ok) {
       const error = new Error(data.detail || data.message || 'API request failed');
