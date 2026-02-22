@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, X, Heart, Package, Grid3X3, ChevronDown } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, Heart, Package, Grid3X3, ChevronDown, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
@@ -23,8 +23,36 @@ import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useWishlist } from '../../context/WishlistContext';
-import { categories } from '../../data/products';
+import ProductService from '../../services/productService';
 import Logo from '../brand/Logo';
+
+const Header = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Fetch categories from API
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await ProductService.getCategories();
+        setCategories(data || []);
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+        // Fallback to empty array
+        setCategories([]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    loadCategories();
+  }, []);
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
