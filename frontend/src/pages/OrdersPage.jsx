@@ -311,9 +311,9 @@ const OrderCard = ({ order, getStatusColor, getStatusIcon, formatDate, onReorder
       <CardHeader className="pb-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-1">
-            <CardTitle className="font-heading text-lg">Order #{order.id}</CardTitle>
+            <CardTitle className="font-heading text-lg">Order #{order.orderNumber}</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Placed on {formatDate(order.createdAt)}
+              Placed on {formatDate(order.date)}
             </p>
           </div>
           <div className="flex items-center gap-3">
