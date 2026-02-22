@@ -718,7 +718,7 @@ const AuthPage = () => {
                       <Button
                         type="submit"
                         className="w-full bg-primary hover:bg-primary-dark"
-                        disabled={isLoading || !signupOtpVerified}
+                        disabled={isLoading}
                         data-testid="signup-submit-btn"
                       >
                         {isLoading ? 'Creating account...' : 'Create Account'}
