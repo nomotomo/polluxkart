@@ -290,6 +290,55 @@ const AuthPage = () => {
     }
   };
 
+  // Handle Forgot Password
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    
+    if (!forgotPasswordData.identifier) {
+      toast.error('Please enter your email or phone number');
+      return;
+    }
+    
+    if (!forgotPasswordData.newPassword) {
+      toast.error('Please enter a new password');
+      return;
+    }
+    
+    if (forgotPasswordData.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    
+    if (forgotPasswordData.newPassword !== forgotPasswordData.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    
+    setResettingPassword(true);
+    
+    try {
+      const response = await apiFetch('/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify({
+          identifier: forgotPasswordData.identifier,
+          new_password: forgotPasswordData.newPassword,
+          confirm_password: forgotPasswordData.confirmPassword,
+        }),
+        includeAuth: false,
+      });
+      
+      if (response.success) {
+        toast.success(response.message || 'Password reset successfully!');
+        setShowForgotPassword(false);
+        setForgotPasswordData({ identifier: '', newPassword: '', confirmPassword: '' });
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to reset password');
+    } finally {
+      setResettingPassword(false);
+    }
+  };
+
   // Reset OTP state when phone number changes
   const handleLoginPhoneChange = (value) => {
     const cleaned = value.replace(/\D/g, '').slice(0, loginCountry.maxLength);
