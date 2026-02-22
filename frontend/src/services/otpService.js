@@ -57,7 +57,7 @@ export const sendOTP = async (phoneNumber, recaptchaContainerId = 'recaptcha-con
     
     switch (error.code) {
       case 'auth/invalid-phone-number':
-        errorMessage = 'Invalid phone number format';
+        errorMessage = 'Invalid phone number format. Use format: +919876543210';
         break;
       case 'auth/too-many-requests':
         errorMessage = 'Too many attempts. Please try again later';
@@ -67,6 +67,18 @@ export const sendOTP = async (phoneNumber, recaptchaContainerId = 'recaptcha-con
         break;
       case 'auth/captcha-check-failed':
         errorMessage = 'reCAPTCHA verification failed. Please try again';
+        break;
+      case 'auth/network-request-failed':
+        errorMessage = 'Network error. Please check your internet connection and ensure this domain is authorized in Firebase Console.';
+        break;
+      case 'auth/internal-error':
+        errorMessage = 'Firebase configuration error. Please contact support.';
+        break;
+      case 'auth/operation-not-allowed':
+        errorMessage = 'Phone authentication is not enabled. Please enable it in Firebase Console.';
+        break;
+      case 'auth/app-not-authorized':
+        errorMessage = 'This app is not authorized to use Firebase. Please add this domain to Firebase authorized domains.';
         break;
       default:
         errorMessage = error.message || 'Failed to send OTP';
