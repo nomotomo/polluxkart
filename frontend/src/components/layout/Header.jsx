@@ -339,16 +339,22 @@ const Header = () => {
                     {/* Mobile Categories */}
                     <div className="pt-2 border-t">
                       <p className="text-sm font-semibold text-muted-foreground mb-2 px-2">Categories</p>
-                      {categories.map((category) => (
-                        <Link
-                          key={category.id}
-                          to={`/store?category=${category.id}`}
-                          className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary p-2 rounded-md hover:bg-muted transition-colors"
-                        >
-                          <span>{categoryIcons[category.id] || '📦'}</span>
-                          {category.name}
-                        </Link>
-                      ))}
+                      {categoriesLoading ? (
+                        <div className="flex items-center justify-center py-4">
+                          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                        </div>
+                      ) : (
+                        categories.map((category) => (
+                          <Link
+                            key={category.id || category.name}
+                            to={`/store?category=${category.name}`}
+                            className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary p-2 rounded-md hover:bg-muted transition-colors"
+                          >
+                            <span>{getCategoryIcon(category.name)}</span>
+                            {category.name}
+                          </Link>
+                        ))
+                      )}
                     </div>
                     
                     <Link
