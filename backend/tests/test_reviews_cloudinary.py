@@ -12,7 +12,7 @@ import requests
 import os
 
 # BASE_URL from environment
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL') or 'https://admin-auth-fix-10.preview.emergentagent.com'
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL') or 'https://pollux-admin-setup.preview.emergentagent.com'
 BASE_URL = BASE_URL.rstrip('/')
 
 # Test credentials
