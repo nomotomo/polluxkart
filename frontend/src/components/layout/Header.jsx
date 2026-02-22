@@ -148,7 +148,7 @@ const Header = () => {
                           {categories.map((category) => (
                             <NavigationMenuLink key={category.id || category.name} asChild>
                               <Link
-                                to={`/store?category=${category.name}`}
+                                to={`/store?category=${category.id}`}
                                 className="group flex items-start gap-3 rounded-lg p-3 hover:bg-muted transition-colors"
                                 data-testid={`nav-category-${category.id || category.name}`}
                               >
