@@ -185,7 +185,7 @@ Collections:
 - 1 Test user
 
 ## Known Mocked Elements
-- **OTP Verification**: Uses Firebase Phone Auth when configured, falls back to mock mode (123456) otherwise
+- **OTP Verification**: Uses simple MongoDB-based OTP with TTL (5 minutes). OTP codes are stored in database and auto-expire. For development, use `/api/otp/debug/{phone}` to see the generated code.
 - **Razorpay**: Mock order IDs generated when API keys not configured
 - **Email Notifications**: SMTP not configured - logs to console
 
