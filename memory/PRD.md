@@ -147,6 +147,7 @@ Collections:
 - [x] **Cloudinary Integration - COMPLETED** (signed upload flow)
 - [x] **Initial Admin Setup Endpoint - COMPLETED** (One-time use for production)
 - [x] **Database Cleanup API - COMPLETED** (Remove seed data while preserving users)
+- [x] **MongoDB-based OTP System - COMPLETED** (Replaces Firebase, simple and reliable)
 
 ## Frontend-Backend Integration (December 2025)
 
