@@ -87,6 +87,7 @@ app.include_router(payments_router, prefix="/api")
 app.include_router(inventory_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(cloudinary_router, prefix="/api")
+app.include_router(otp_router, prefix="/api")
 
 # Serve uploaded images
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
