@@ -419,18 +419,32 @@ const OrderCard = ({ order, getStatusColor, getStatusIcon, formatDate, onReorder
         <div className="pt-4">
           <div className="flex items-center justify-between relative">
             <div className="absolute left-0 right-0 top-1/2 h-1 bg-muted -translate-y-1/2" />
-            <div className="absolute left-0 right-0 top-1/2 h-1 bg-primary -translate-y-1/2" style={{ width: order.status === 'confirmed' ? '25%' : order.status === 'processing' ? '50%' : order.status === 'shipped' ? '75%' : '100%' }} />
+            <div 
+              className="absolute left-0 top-1/2 h-1 bg-primary -translate-y-1/2 transition-all duration-300" 
+              style={{ 
+                width: order.status === 'pending' ? '0%' 
+                     : order.status === 'confirmed' ? '25%' 
+                     : order.status === 'processing' ? '50%' 
+                     : order.status === 'shipped' ? '75%' 
+                     : order.status === 'delivered' ? '100%' 
+                     : '0%' 
+              }} 
+            />
             
-            {['confirmed', 'processing', 'shipped', 'delivered'].map((step, index) => {
-              const isCompleted = ['confirmed', 'processing', 'shipped', 'delivered'].indexOf(order.status) >= index;
+            {['pending', 'confirmed', 'processing', 'shipped', 'delivered'].map((step, index) => {
+              const statusOrder = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
+              const currentStatusIndex = statusOrder.indexOf(order.status);
+              const isCompleted = currentStatusIndex >= index;
+              const isCurrent = order.status === step;
+              
               return (
                 <div key={step} className="relative flex flex-col items-center z-10">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                       isCompleted
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-muted text-muted-foreground'
-                    }`}
+                    } ${isCurrent ? 'ring-2 ring-primary ring-offset-2' : ''}`}
                   >
                     {isCompleted ? (
                       <CheckCircle2 className="h-4 w-4" />
@@ -438,8 +452,8 @@ const OrderCard = ({ order, getStatusColor, getStatusIcon, formatDate, onReorder
                       <span className="text-xs">{index + 1}</span>
                     )}
                   </div>
-                  <span className="text-xs mt-2 text-muted-foreground capitalize hidden sm:block">
-                    {step}
+                  <span className={`text-xs mt-2 capitalize hidden sm:block ${isCurrent ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                    {step === 'pending' ? 'Order Placed' : step}
                   </span>
                 </div>
               );
