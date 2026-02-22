@@ -80,14 +80,20 @@ const Header = () => {
 
   const isActive = (path) => location.pathname === path;
 
-  // Category icons map
-  const categoryIcons = {
-    electronics: '💻',
-    fashion: '👗',
-    home: '🏠',
-    grocery: '🍎',
-    beauty: '✨',
-    sports: '🏋️',
+  // Category icons map - default icons based on common category names
+  const getCategoryIcon = (categoryName) => {
+    const name = categoryName?.toLowerCase() || '';
+    if (name.includes('electronic')) return '💻';
+    if (name.includes('fashion') || name.includes('cloth')) return '👗';
+    if (name.includes('home') || name.includes('living')) return '🏠';
+    if (name.includes('grocer') || name.includes('food')) return '🍎';
+    if (name.includes('beauty') || name.includes('cosmetic')) return '✨';
+    if (name.includes('sport') || name.includes('fitness')) return '🏋️';
+    if (name.includes('book')) return '📚';
+    if (name.includes('toy') || name.includes('game')) return '🎮';
+    if (name.includes('health')) return '💊';
+    if (name.includes('auto') || name.includes('car')) return '🚗';
+    return '📦';
   };
 
   return (
