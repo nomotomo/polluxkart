@@ -108,7 +108,7 @@ const AuthPage = () => {
     }
   };
 
-  // Send OTP using Firebase or Mock
+  // Send OTP using MongoDB backend
   const sendOtp = async (phone, isLogin = true) => {
     if (!phone || phone.length < 7) {
       toast.error('Please enter a valid phone number');
@@ -118,10 +118,9 @@ const AuthPage = () => {
     setSendingOtp(true);
     
     const fullPhoneNumber = `${isLogin ? loginCountryCode : signupCountryCode}${phone}`;
-    const recaptchaId = isLogin ? 'recaptcha-login' : 'recaptcha-signup';
     
     try {
-      const result = await OTPService.sendOTP(fullPhoneNumber, recaptchaId);
+      const result = await OTPService.sendOTP(fullPhoneNumber);
       
       if (result.success) {
         if (isLogin) {
@@ -135,13 +134,14 @@ const AuthPage = () => {
         }
         
         setOtpTimer(30);
+        toast.success(result.message || `OTP sent to ${fullPhoneNumber}`);
         
-        if (result.isMock) {
-          toast.success(`OTP sent to ${fullPhoneNumber}`, {
-            description: 'MOCK MODE: Use 123456 as OTP',
-          });
-        } else {
-          toast.success(`OTP sent to ${fullPhoneNumber}`);
+        // For development: fetch and show the OTP
+        if (process.env.NODE_ENV === 'development') {
+          const debug = await OTPService.debugGetOTP(fullPhoneNumber);
+          if (debug?.otp?.code) {
+            console.log(`[DEV] OTP for ${fullPhoneNumber}: ${debug.otp.code}`);
+          }
         }
       } else {
         toast.error(result.message || 'Failed to send OTP');
@@ -154,7 +154,7 @@ const AuthPage = () => {
     }
   };
 
-  // Verify OTP using Firebase or Mock
+  // Verify OTP using MongoDB backend
   const verifyOtp = async (otp, isLogin = true) => {
     const otpString = otp.join('');
     if (otpString.length !== 6) {
@@ -164,8 +164,12 @@ const AuthPage = () => {
 
     setVerifyingOtp(true);
     
+    const fullPhoneNumber = isLogin 
+      ? `${loginCountryCode}${loginData.phone}`
+      : `${signupCountryCode}${signupData.phone}`;
+    
     try {
-      const result = await OTPService.verifyOTP(otpString);
+      const result = await OTPService.verifyOTP(otpString, fullPhoneNumber);
       
       if (result.success) {
         if (isLogin) {
@@ -174,11 +178,7 @@ const AuthPage = () => {
           setSignupOtpVerified(true);
         }
         
-        if (result.isMock) {
-          toast.success('Phone number verified! (MOCK MODE)');
-        } else {
-          toast.success('Phone number verified!');
-        }
+        toast.success(result.message || 'Phone number verified!');
         return true;
       } else {
         toast.error(result.message || 'Invalid OTP. Please try again.');
