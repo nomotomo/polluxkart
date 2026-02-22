@@ -234,6 +234,7 @@ REACT_APP_FIREBASE_APP_ID=your-app-id
 - [x] ~~Fix image upload URL issues~~ ✅ COMPLETED
 - [x] ~~Fix checkout 400 error (cart sync)~~ ✅ COMPLETED
 - [x] ~~Fix Orders page (API integration)~~ ✅ COMPLETED
+- [x] ~~Categories sync (navbar, homepage, modal)~~ ✅ COMPLETED
 - [ ] Configure Razorpay live keys
 
 ### P1 - Important
