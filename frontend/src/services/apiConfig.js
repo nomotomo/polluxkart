@@ -90,42 +90,48 @@ export const apiFetch = async (endpoint, options = {}) => {
     },
   };
   
+  let response;
   try {
-    const response = await fetch(url, config);
-    
-    // Handle no content responses
-    if (response.status === 204) {
-      return null;
-    }
-    
-    // Clone response to avoid "Body is disturbed or locked" error
-    const responseClone = response.clone();
-    
-    let data;
-    try {
-      data = await response.json();
-    } catch (parseError) {
-      // If JSON parsing fails, try to get text from cloned response
-      const text = await responseClone.text();
-      console.error('Failed to parse JSON response:', text);
-      throw new Error('Invalid server response');
-    }
-    
-    if (!response.ok) {
-      const error = new Error(data.detail || data.message || 'API request failed');
-      error.status = response.status;
-      error.data = data;
-      throw error;
-    }
-    
-    return data;
-  } catch (error) {
-    if (error.status) {
-      throw error;
-    }
-    console.error('API fetch error:', error);
-    throw new Error(error.message || 'Network error');
+    response = await fetch(url, config);
+  } catch (networkError) {
+    console.error('Network error:', networkError);
+    throw new Error('Network error. Please check your connection.');
   }
+  
+  // Handle no content responses
+  if (response.status === 204) {
+    return null;
+  }
+  
+  // Read response body as text first
+  let responseText;
+  try {
+    responseText = await response.text();
+  } catch (readError) {
+    console.error('Failed to read response:', readError);
+    throw new Error('Failed to read server response');
+  }
+  
+  // Try to parse as JSON
+  let data;
+  try {
+    data = responseText ? JSON.parse(responseText) : {};
+  } catch (parseError) {
+    console.error('Failed to parse JSON:', responseText);
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+    throw new Error('Invalid server response');
+  }
+  
+  if (!response.ok) {
+    const error = new Error(data.detail || data.message || 'API request failed');
+    error.status = response.status;
+    error.data = data;
+    throw error;
+  }
+  
+  return data;
 };
 
 export default API_CONFIG;
