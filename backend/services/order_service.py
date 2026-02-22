@@ -35,9 +35,19 @@ class OrderService:
         if not cart.items:
             raise ValueError("Cart is empty")
         
-        # Check inventory for all items
+        # Batch check inventory for all items (avoid N+1)
+        product_ids = [item.product_id for item in cart.items]
+        inventory_cursor = self.db[COLLECTIONS['inventory']].find(
+            {"product_id": {"$in": product_ids}},
+            {"_id": 0}
+        )
+        inventory_list = await inventory_cursor.to_list(length=len(product_ids))
+        inventory_map = {inv["product_id"]: inv for inv in inventory_list}
+        
+        # Validate stock for all items
         for item in cart.items:
-            available = await self.inventory_service.get_available_stock(item.product_id)
+            inv = inventory_map.get(item.product_id)
+            available = (inv.get("quantity", 0) - inv.get("reserved", 0)) if inv else 0
             if available < item.quantity:
                 raise ValueError(f"Insufficient stock for {item.name}. Available: {available}")
         
@@ -90,13 +100,34 @@ class OrderService:
         
         await self.orders.insert_one(order_dict)
         
-        # Reserve inventory
+        # Batch reserve inventory using bulkWrite (avoid N+1)
+        bulk_ops = []
         for item in cart.items:
-            await self.inventory_service.reserve_stock(
-                item.product_id, 
-                item.quantity,
-                order_id
-            )
+            bulk_ops.append({
+                "updateOne": {
+                    "filter": {"product_id": item.product_id},
+                    "update": {"$inc": {"reserved": item.quantity}}
+                }
+            })
+        
+        if bulk_ops:
+            await self.db[COLLECTIONS['inventory']].bulk_write(bulk_ops)
+            
+            # Record stock movements
+            movements = []
+            for item in cart.items:
+                movements.append({
+                    "id": str(uuid.uuid4()),
+                    "product_id": item.product_id,
+                    "type": "reserve",
+                    "quantity": item.quantity,
+                    "reference_id": order_id,
+                    "reference_type": "order",
+                    "notes": f"Reserved for order {order_number}",
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                })
+            if movements:
+                await self.db[COLLECTIONS['stock_movements']].insert_many(movements)
         
         return OrderResponse(**order_dict)
     
