@@ -127,6 +127,24 @@ async def check_setup_status():
         "message": "Initial admin setup is complete" if admin_count > 0 else "No admin exists. Initial setup endpoint is available."
     }
 
+@router.get("/setup/admin-info")
+async def get_admin_info():
+    """
+    Get basic info about existing admin users (for debugging).
+    Only returns email/phone, not sensitive data.
+    """
+    db = get_db()
+    
+    admins = await db.users.find(
+        {"role": {"$in": ["admin", "super_admin"]}},
+        {"_id": 0, "email": 1, "phone": 1, "name": 1, "role": 1, "created_at": 1}
+    ).to_list(length=10)
+    
+    return {
+        "admin_count": len(admins),
+        "admins": admins
+    }
+
 # Middleware to check admin role
 async def require_admin(current_user: dict = Depends(get_current_user)):
     """Require admin role for access"""
