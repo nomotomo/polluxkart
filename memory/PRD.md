@@ -295,3 +295,39 @@ REACT_APP_FIREBASE_APP_ID=1:123456789:web:abc123
 6. Restart the frontend service
 
 Without these keys, OTP will use mock mode (any 6-digit code works, use 123456).
+
+
+## Production Admin Setup Instructions
+For fresh production deployments, you need to create the first admin user:
+
+### Step 1: Check if Setup is Needed
+```bash
+curl https://your-domain.com/api/admin/setup/status
+```
+Response will show `"setup_available": true` if no admin exists.
+
+### Step 2: Create Initial Admin (ONE-TIME ONLY)
+```bash
+curl -X POST https://your-domain.com/api/admin/setup/initial-admin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@yourdomain.com",
+    "phone": "+919876543210",
+    "name": "Admin User",
+    "password": "YourSecurePassword123",
+    "setup_key": "POLLUXKART_INITIAL_ADMIN_2025"
+  }'
+```
+
+**Important Security Notes:**
+- This endpoint only works ONCE when no admin exists
+- After the first admin is created, this endpoint is permanently disabled
+- The `setup_key` is set to `POLLUXKART_INITIAL_ADMIN_2025` by default
+- For extra security, set `ADMIN_SETUP_KEY` environment variable in production
+- After creating the admin, login via the web UI at /login
+
+### Troubleshooting Firebase OTP `auth/network-request-failed`
+This error typically occurs when:
+1. **Domain not authorized**: Add your domain to Firebase Console → Authentication → Settings → Authorized domains
+2. **Network issues**: Check your internet connection
+3. **Firebase configuration**: Verify all Firebase env variables are set correctly
