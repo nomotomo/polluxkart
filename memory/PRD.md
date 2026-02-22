@@ -98,6 +98,11 @@ Collections:
 - `PUT /api/admin/promotions/{id}` - Update promotion
 - `DELETE /api/admin/promotions/{id}` - Delete promotion
 - `GET /api/admin/orders` - Get all orders
+- `DELETE /api/admin/cleanup/seed-data` - Remove all seed/test data (preserves users)
+
+### Admin Setup (no auth required - one-time use)
+- `GET /api/admin/setup/status` - Check if admin exists
+- `POST /api/admin/setup/initial-admin` - Create first admin user (only works once)
 - `PUT /api/admin/orders/{id}/status` - Update order status
 - `GET /api/admin/users` - Get all users
 - `PUT /api/admin/users/{id}/role` - Update user role
