@@ -187,13 +187,21 @@ class WishlistService:
         return any(item.product_id == product_id for item in wishlist.items)
     
     async def get_wishlist_products(self, user_id: str):
-        """Get full product details for wishlist items"""
+        """Get full product details for wishlist items - optimized batch query"""
         wishlist = await self.get_wishlist(user_id)
-        products = []
         
-        for item in wishlist.items:
-            product = await self.product_service.get_product_by_id(item.product_id)
-            if product:
-                products.append(product)
+        if not wishlist.items:
+            return []
         
-        return products
+        # Batch fetch all products in a single query (avoid N+1)
+        product_ids = [item.product_id for item in wishlist.items]
+        products_cursor = self.db[COLLECTIONS['products']].find(
+            {"id": {"$in": product_ids}, "is_active": True},
+            {"_id": 0}
+        )
+        products_list = await products_cursor.to_list(length=len(product_ids))
+        
+        # Convert to ProductResponse objects
+        from models.product import ProductResponse
+        return [ProductResponse(**p) for p in products_list]
+
