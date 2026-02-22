@@ -101,16 +101,20 @@ async def verify_otp(request: VerifyOTPRequest):
         # Check if OTP exists but expired or wrong code
         existing = await db.otps.find_one({"phone": phone})
         if existing:
-            if existing.get("expires_at") < datetime.now(timezone.utc):
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="OTP has expired. Please request a new one."
-                )
-            else:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Invalid OTP code"
-                )
+            expires_at = existing.get("expires_at")
+            # Handle timezone-aware comparison
+            if expires_at:
+                if expires_at.tzinfo is None:
+                    expires_at = expires_at.replace(tzinfo=timezone.utc)
+                if expires_at < datetime.now(timezone.utc):
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="OTP has expired. Please request a new one."
+                    )
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid OTP code"
+            )
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
