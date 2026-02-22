@@ -306,3 +306,40 @@ async def update_user_role(
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return user
+
+# Database Cleanup (for removing seed data)
+@router.delete("/cleanup/seed-data")
+async def cleanup_seed_data(
+    confirm: str = Query(..., description="Must be 'CONFIRM' to proceed"),
+    current_user: dict = Depends(require_admin)
+):
+    """
+    Delete all seed/test data from the database.
+    This removes products, categories, orders, etc. but preserves users.
+    Use this ONLY ONCE after deployment to clean up development data.
+    """
+    if confirm != "CONFIRM":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must pass confirm=CONFIRM to proceed with cleanup"
+        )
+    
+    db = admin_service.db
+    
+    collections_to_clean = [
+        "products", "categories", "inventory", "reviews",
+        "carts", "wishlists", "orders", "payments", 
+        "stock_movements", "promotions"
+    ]
+    
+    results = {}
+    for collection in collections_to_clean:
+        result = await db[collection].delete_many({})
+        results[collection] = result.deleted_count
+    
+    return {
+        "message": "Seed data cleanup complete",
+        "deleted": results,
+        "preserved": ["users"]
+    }
+
