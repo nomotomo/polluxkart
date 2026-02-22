@@ -800,6 +800,117 @@ const AuthPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-primary" />
+              Reset Password
+            </DialogTitle>
+            <DialogDescription>
+              Enter your email or phone number and create a new password.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleForgotPassword} className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="reset-identifier">Email or Phone Number</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="reset-identifier"
+                  type="text"
+                  placeholder="Enter your email or phone"
+                  value={forgotPasswordData.identifier}
+                  onChange={(e) =>
+                    setForgotPasswordData({ ...forgotPasswordData, identifier: e.target.value })
+                  }
+                  className="pl-10"
+                  data-testid="reset-identifier-input"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                For phone, include country code (e.g., +919876543210)
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="reset-new-password">New Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="reset-new-password"
+                  type={showNewPassword ? 'text' : 'password'}
+                  placeholder="Enter new password"
+                  value={forgotPasswordData.newPassword}
+                  onChange={(e) =>
+                    setForgotPasswordData({ ...forgotPasswordData, newPassword: e.target.value })
+                  }
+                  className="pl-10 pr-10"
+                  data-testid="reset-new-password-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">Minimum 6 characters</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="reset-confirm-password">Confirm New Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="reset-confirm-password"
+                  type={showNewPassword ? 'text' : 'password'}
+                  placeholder="Confirm new password"
+                  value={forgotPasswordData.confirmPassword}
+                  onChange={(e) =>
+                    setForgotPasswordData({ ...forgotPasswordData, confirmPassword: e.target.value })
+                  }
+                  className="pl-10"
+                  data-testid="reset-confirm-password-input"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setForgotPasswordData({ identifier: '', newPassword: '', confirmPassword: '' });
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1"
+                disabled={resettingPassword}
+                data-testid="reset-password-submit-btn"
+              >
+                {resettingPassword ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Resetting...
+                  </>
+                ) : (
+                  'Reset Password'
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
