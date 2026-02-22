@@ -35,4 +35,6 @@ COLLECTIONS = {
     'wishlists': 'wishlists',
     'inventory': 'inventory',
     'payments': 'payments',
+    'stock_movements': 'stock_movements',
+    'promotions': 'promotions',
 }
