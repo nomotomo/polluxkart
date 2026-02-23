@@ -127,6 +127,32 @@ class CategoryUpdate(BaseModel):
     parent_id: Optional[str] = None
     is_active: Optional[bool] = None
 
+# Brand Admin
+class BrandCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    logo: Optional[str] = None
+    website: Optional[str] = None
+    is_active: bool = True
+
+class BrandUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    logo: Optional[str] = None
+    website: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class BrandResponse(BaseModel):
+    id: str
+    name: str
+    description: Optional[str] = None
+    logo: Optional[str] = None
+    website: Optional[str] = None
+    is_active: bool = True
+    product_count: int = 0
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
 # Image Upload
 class ImageUploadResponse(BaseModel):
     url: str

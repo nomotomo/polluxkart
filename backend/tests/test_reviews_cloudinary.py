@@ -10,10 +10,10 @@ Features tested:
 import pytest
 import requests
 import os
+import time
 
-# BASE_URL from environment
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL') or 'https://pollux-admin-setup.preview.emergentagent.com'
-BASE_URL = BASE_URL.rstrip('/')
+# Import BASE_URL from conftest
+from tests.conftest import BASE_URL
 
 # Test credentials
 TEST_USER_EMAIL = "test@polluxkart.com"
@@ -233,10 +233,9 @@ class TestAdminPromotions:
         assert isinstance(data, list)
         print(f"Found {len(data)} promotions")
     
-    def test_create_promotion(self, authenticated_client):
+    def test_create_promotion(self, authenticated_client, unique_promo_code):
         """Test creating a new promotion"""
-        import time
-        promo_code = f"TEST{int(time.time())}"
+        promo_code = unique_promo_code
         
         promo_data = {
             "code": promo_code,
@@ -258,7 +257,7 @@ class TestAdminPromotions:
         
         data = response.json()
         assert "id" in data
-        assert data["code"] == promo_code
+        assert data["code"] == promo_code.upper()  # Backend uppercases codes
         assert data["discount_value"] == 10
         print(f"Created promotion: {data['id']} with code {promo_code}")
         
@@ -267,7 +266,7 @@ class TestAdminPromotions:
     def test_update_promotion(self, authenticated_client):
         """Test updating a promotion"""
         import time
-        promo_code = f"TESTUPD{int(time.time())}"
+        promo_code = f"TESTUPD{int(time.time() * 1000)}"
         
         # Create a promotion first
         create_data = {

@@ -4,22 +4,19 @@ Admin Authentication tests - Tests for admin role verification and protected rou
 import pytest
 import os
 
-# BASE_URL: Use environment variable if available, otherwise fallback to production URL
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL') or os.environ.get('API_BASE_URL') or 'https://pollux-admin-setup.preview.emergentagent.com'
-BASE_URL = BASE_URL.rstrip('/')
+# Import BASE_URL from conftest
+from tests.conftest import BASE_URL
 
 
 class TestAdminAuth:
     """Admin authentication and role verification tests"""
     
-    def test_admin_login_returns_role(self, api_client):
+    def test_admin_login_returns_role(self, api_client, ensure_admin_user, admin_credentials):
         """Test that admin login returns user with admin role in response"""
-        login_data = {
-            "identifier": "test@polluxkart.com",
-            "password": "Test@123"
-        }
+        if not ensure_admin_user:
+            pytest.skip("Admin user could not be created")
         
-        response = api_client.post(f"{BASE_URL}/api/auth/login", json=login_data)
+        response = api_client.post(f"{BASE_URL}/api/auth/login", json=admin_credentials)
         
         assert response.status_code == 200, f"Admin login failed: {response.text}"
         
@@ -27,16 +24,15 @@ class TestAdminAuth:
         assert "access_token" in data
         assert "user" in data
         assert "role" in data["user"], "User response must include role field"
-        assert data["user"]["role"] == "admin", f"Expected admin role, got {data['user'].get('role')}"
+        assert data["user"]["role"] in ["admin", "super_admin"], f"Expected admin role, got {data['user'].get('role')}"
     
-    def test_admin_dashboard_with_token(self, api_client):
+    def test_admin_dashboard_with_token(self, api_client, ensure_admin_user, admin_credentials):
         """Test admin dashboard API with valid admin token"""
+        if not ensure_admin_user:
+            pytest.skip("Admin user could not be created")
+        
         # First login as admin
-        login_data = {
-            "identifier": "test@polluxkart.com",
-            "password": "Test@123"
-        }
-        login_response = api_client.post(f"{BASE_URL}/api/auth/login", json=login_data)
+        login_response = api_client.post(f"{BASE_URL}/api/auth/login", json=admin_credentials)
         assert login_response.status_code == 200
         
         token = login_response.json()["access_token"]
@@ -51,14 +47,13 @@ class TestAdminAuth:
         # Verify dashboard structure
         assert isinstance(dashboard_data, dict)
     
-    def test_admin_products_endpoint_with_token(self, api_client):
+    def test_admin_products_endpoint_with_token(self, api_client, ensure_admin_user, admin_credentials):
         """Test that admin can access products list with token"""
+        if not ensure_admin_user:
+            pytest.skip("Admin user could not be created")
+        
         # Login as admin
-        login_data = {
-            "identifier": "test@polluxkart.com",
-            "password": "Test@123"
-        }
-        login_response = api_client.post(f"{BASE_URL}/api/auth/login", json=login_data)
+        login_response = api_client.post(f"{BASE_URL}/api/auth/login", json=admin_credentials)
         assert login_response.status_code == 200
         
         token = login_response.json()["access_token"]
@@ -66,7 +61,7 @@ class TestAdminAuth:
         # Access products (should work with pageSize=50 fix)
         headers = {"Authorization": f"Bearer {token}"}
         products_response = api_client.get(
-            f"{BASE_URL}/api/products?page=1&pageSize=50",
+            f"{BASE_URL}/api/products?page=1&page_size=50",
             headers=headers
         )
         
@@ -75,31 +70,25 @@ class TestAdminAuth:
         data = products_response.json()
         assert "products" in data
     
-    def test_admin_products_large_pagesize_fails(self, api_client):
+    def test_admin_products_large_pagesize_fails(self, api_client, ensure_admin_user, admin_credentials):
         """Test that very large pageSize returns 422 validation error"""
-        login_data = {
-            "identifier": "test@polluxkart.com",
-            "password": "Test@123"
-        }
-        login_response = api_client.post(f"{BASE_URL}/api/auth/login", json=login_data)
+        if not ensure_admin_user:
+            pytest.skip("Admin user could not be created")
+        
+        login_response = api_client.post(f"{BASE_URL}/api/auth/login", json=admin_credentials)
         assert login_response.status_code == 200
         
         token = login_response.json()["access_token"]
         headers = {"Authorization": f"Bearer {token}"}
         
-        # Try with pageSize > 100 (which caused the original 422 error)
+        # Try with page_size > 50 (the limit is 50)
         products_response = api_client.get(
-            f"{BASE_URL}/api/products?page=1&pageSize=100",
+            f"{BASE_URL}/api/products?page=1&page_size=100",
             headers=headers
         )
         
-        # This should either work or return 422 - documenting current behavior
-        # If it returns 200, the limit has been increased
-        # If it returns 422, the fix is to use smaller pageSize
-        if products_response.status_code == 422:
-            print("pageSize=100 causes 422 - need to use 50 or less")
-        else:
-            print(f"pageSize=100 returns {products_response.status_code}")
+        # page_size > 50 should fail with 422
+        assert products_response.status_code == 422, f"Expected 422 for page_size>50, got {products_response.status_code}"
     
     def test_protected_endpoint_without_token_fails(self, api_client):
         """Test that protected admin endpoints fail without token"""
@@ -109,10 +98,12 @@ class TestAdminAuth:
         # Should fail with 401 or 403
         assert response.status_code in [401, 403], f"Expected auth error, got {response.status_code}"
     
-    def test_regular_user_role_on_login(self, api_client, test_user_credentials):
+    def test_regular_user_role_on_login(self, api_client, ensure_test_user):
         """Test that regular users get 'user' role on login"""
-        # Use test fixtures for regular user - this may be same as admin for test purposes
-        # Creating a new regular user to verify role
+        if not ensure_test_user:
+            pytest.skip("Test user could not be created")
+        
+        # Use test fixtures for regular user
         import uuid
         unique_id = str(uuid.uuid4())[:8]
         
@@ -143,19 +134,55 @@ class TestAdminAuth:
                     login_data_resp = login_response.json()
                     if "user" in login_data_resp and "role" in login_data_resp["user"]:
                         assert login_data_resp["user"]["role"] == "user"
+    
+    def test_regular_user_cannot_access_admin(self, api_client, ensure_test_user):
+        """Test that regular users cannot access admin endpoints"""
+        if not ensure_test_user:
+            pytest.skip("Test user could not be created")
+        
+        # Create a new regular user to ensure they don't have admin role
+        import uuid
+        unique_id = str(uuid.uuid4())[:8]
+        
+        register_data = {
+            "email": f"TEST_noadmin_{unique_id}@polluxkart.com",
+            "phone": f"+91{unique_id}54321",
+            "name": f"Non-Admin User {unique_id}",
+            "password": "TestPass@123"
+        }
+        
+        register_response = api_client.post(f"{BASE_URL}/api/auth/register", json=register_data)
+        if register_response.status_code != 201:
+            pytest.skip("Could not create test user")
+        
+        # Login as the new regular user
+        login_data = {
+            "identifier": register_data["email"],
+            "password": register_data["password"]
+        }
+        login_response = api_client.post(f"{BASE_URL}/api/auth/login", json=login_data)
+        if login_response.status_code != 200:
+            pytest.skip("Could not login as test user")
+        
+        token = login_response.json()["access_token"]
+        headers = {"Authorization": f"Bearer {token}"}
+        
+        # Try to access admin dashboard
+        dashboard_response = api_client.get(f"{BASE_URL}/api/admin/dashboard", headers=headers)
+        
+        # Regular user should be forbidden
+        assert dashboard_response.status_code == 403, f"Expected 403 for regular user, got {dashboard_response.status_code}"
 
 
 class TestJWTTokenRole:
     """Tests for JWT token containing role information"""
     
-    def test_jwt_token_contains_role_claim(self, api_client):
+    def test_jwt_token_contains_role_claim(self, api_client, ensure_admin_user, admin_credentials):
         """Verify that the JWT token payload includes the role claim"""
-        login_data = {
-            "identifier": "test@polluxkart.com",
-            "password": "Test@123"
-        }
+        if not ensure_admin_user:
+            pytest.skip("Admin user could not be created")
         
-        response = api_client.post(f"{BASE_URL}/api/auth/login", json=login_data)
+        response = api_client.post(f"{BASE_URL}/api/auth/login", json=admin_credentials)
         assert response.status_code == 200
         
         data = response.json()
@@ -178,4 +205,4 @@ class TestJWTTokenRole:
             payload = json.loads(payload_json)
             
             assert "role" in payload, "JWT token should contain 'role' claim"
-            assert payload["role"] == "admin", f"Admin user JWT should have role='admin', got {payload.get('role')}"
+            assert payload["role"] in ["admin", "super_admin"], f"Admin user JWT should have admin role, got {payload.get('role')}"

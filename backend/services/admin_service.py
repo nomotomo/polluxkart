@@ -3,6 +3,7 @@ from config.database import Database
 from models.admin import (
     DashboardStats, PromotionCreate, PromotionResponse, PromotionUpdate,
     ProductCreate, ProductUpdate, CategoryCreate, CategoryUpdate,
+    BrandCreate, BrandUpdate, BrandResponse,
     PromotionStatus, UserRole
 )
 from models.order import OrderStatus
@@ -395,3 +396,120 @@ class AdminService:
             return None
         
         return await self.db.users.find_one({"id": user_id}, {"_id": 0, "password": 0})
+
+    # Brands
+    async def create_brand(self, brand_data: BrandCreate) -> dict:
+        """Create a new brand"""
+        # Check if brand name already exists
+        existing = await self.db.brands.find_one({"name": {"$regex": f"^{brand_data.name}$", "$options": "i"}})
+        if existing:
+            raise ValueError("Brand with this name already exists")
+        
+        brand = {
+            "id": str(uuid.uuid4()),
+            "name": brand_data.name,
+            "description": brand_data.description,
+            "logo": brand_data.logo,
+            "website": brand_data.website,
+            "is_active": brand_data.is_active,
+            "product_count": 0,
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        }
+        
+        await self.db.brands.insert_one(brand)
+        brand.pop("_id", None)
+        return brand
+
+    async def update_brand(self, brand_id: str, update_data: BrandUpdate) -> Optional[dict]:
+        """Update a brand"""
+        update_dict = {k: v for k, v in update_data.model_dump().items() if v is not None}
+        if not update_dict:
+            return await self.db.brands.find_one({"id": brand_id}, {"_id": 0})
+        
+        # Check if updating name and it already exists
+        if "name" in update_dict:
+            existing = await self.db.brands.find_one({
+                "name": {"$regex": f"^{update_dict['name']}$", "$options": "i"},
+                "id": {"$ne": brand_id}
+            })
+            if existing:
+                raise ValueError("Brand with this name already exists")
+        
+        update_dict["updated_at"] = datetime.now(timezone.utc)
+        
+        result = await self.db.brands.update_one(
+            {"id": brand_id},
+            {"$set": update_dict}
+        )
+        
+        if result.matched_count == 0:
+            return None
+        
+        return await self.db.brands.find_one({"id": brand_id}, {"_id": 0})
+
+    async def delete_brand(self, brand_id: str) -> bool:
+        """Delete a brand"""
+        # Check if brand has products
+        brand = await self.db.brands.find_one({"id": brand_id}, {"_id": 0})
+        if not brand:
+            return False
+        
+        product_count = await self.db.products.count_documents({"brand": brand["name"]})
+        if product_count > 0:
+            raise ValueError(f"Cannot delete brand with {product_count} products. Please reassign products first.")
+        
+        result = await self.db.brands.delete_one({"id": brand_id})
+        return result.deleted_count > 0
+
+    async def get_all_brands(self, include_inactive: bool = False) -> List[dict]:
+        """Get all brands with product counts"""
+        query = {} if include_inactive else {"is_active": True}
+        brands = await self.db.brands.find(query, {"_id": 0}).sort("name", 1).to_list(500)
+        
+        # Update product counts
+        for brand in brands:
+            count = await self.db.products.count_documents({"brand": brand["name"], "is_active": True})
+            brand["product_count"] = count
+        
+        return brands
+
+    async def migrate_existing_brands(self) -> dict:
+        """Migrate existing brands from products to brands collection"""
+        # Get unique brands from products
+        existing_brands = await self.db.products.distinct("brand", {"brand": {"$ne": None}})
+        
+        migrated = 0
+        skipped = 0
+        
+        for brand_name in existing_brands:
+            if not brand_name or not brand_name.strip():
+                continue
+            
+            # Check if brand already exists
+            existing = await self.db.brands.find_one({"name": {"$regex": f"^{brand_name}$", "$options": "i"}})
+            if existing:
+                skipped += 1
+                continue
+            
+            # Create brand
+            brand = {
+                "id": str(uuid.uuid4()),
+                "name": brand_name.strip(),
+                "description": None,
+                "logo": None,
+                "website": None,
+                "is_active": True,
+                "product_count": 0,
+                "created_at": datetime.now(timezone.utc),
+                "updated_at": datetime.now(timezone.utc)
+            }
+            
+            await self.db.brands.insert_one(brand)
+            migrated += 1
+        
+        return {
+            "migrated": migrated,
+            "skipped": skipped,
+            "total_brands": migrated + skipped
+        }

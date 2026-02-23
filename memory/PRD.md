@@ -38,6 +38,7 @@ Collections:
 - `reviews` - Product reviews
 - `stock_movements` - Inventory audit trail
 - `promotions` - Discount codes and promotions
+- `brands` - Product brands
 
 ## API Endpoints
 
@@ -93,6 +94,11 @@ Collections:
 - `POST /api/admin/categories` - Create category
 - `PUT /api/admin/categories/{id}` - Update category
 - `DELETE /api/admin/categories/{id}` - Delete category
+- `GET /api/admin/brands` - Get all brands
+- `POST /api/admin/brands` - Create brand
+- `PUT /api/admin/brands/{id}` - Update brand
+- `DELETE /api/admin/brands/{id}` - Delete brand
+- `POST /api/admin/brands/migrate` - Migrate brands from products
 - `GET /api/admin/promotions` - Get all promotions
 - `POST /api/admin/promotions` - Create promotion
 - `PUT /api/admin/promotions/{id}` - Update promotion

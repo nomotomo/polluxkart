@@ -5,9 +5,8 @@ import pytest
 import uuid
 import os
 
-# BASE_URL: Use environment variable if available, otherwise fallback to production URL
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL') or os.environ.get('API_BASE_URL') or 'https://pollux-admin-setup.preview.emergentagent.com'
-BASE_URL = BASE_URL.rstrip('/')
+# Import BASE_URL from conftest
+from tests.conftest import BASE_URL
 
 
 class TestAuthRegister:
@@ -39,7 +38,7 @@ class TestAuthRegister:
         assert isinstance(data["access_token"], str)
         assert len(data["access_token"]) > 0
     
-    def test_register_duplicate_phone_fails(self, api_client, test_user_phone):
+    def test_register_duplicate_phone_fails(self, api_client, test_user_phone, ensure_test_user):
         """Test registration with duplicate phone fails"""
         unique_id = str(uuid.uuid4())[:8]
         user_data = {
@@ -70,8 +69,12 @@ class TestAuthRegister:
 class TestAuthLogin:
     """User login tests"""
     
-    def test_login_with_email_success(self, api_client, test_user_credentials):
+    def test_login_with_email_success(self, api_client, test_user_credentials, ensure_test_user):
         """Test successful login with email"""
+        # Skip if test user couldn't be created
+        if not ensure_test_user:
+            pytest.skip("Test user could not be created")
+        
         response = api_client.post(
             f"{BASE_URL}/api/auth/login",
             json=test_user_credentials
@@ -89,10 +92,19 @@ class TestAuthLogin:
         assert "id" in data["user"]
         assert "name" in data["user"]
     
-    def test_login_with_phone_success(self, api_client, test_user_phone):
+    def test_login_with_phone_success(self, api_client, ensure_test_user):
         """Test successful login with phone number"""
+        # Skip if test user couldn't be created
+        if not ensure_test_user:
+            pytest.skip("Test user could not be created")
+        
+        # Get the actual phone from ensure_test_user
+        user_phone = ensure_test_user.get("user", {}).get("phone")
+        if not user_phone:
+            pytest.skip("Test user has no phone number")
+        
         login_data = {
-            "identifier": test_user_phone,
+            "identifier": user_phone,
             "password": "Test@123"
         }
         

@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr
 from models.admin import (
     DashboardStats, PromotionCreate, PromotionResponse, PromotionUpdate,
     ProductCreate, ProductUpdate, CategoryCreate, CategoryUpdate,
+    BrandCreate, BrandUpdate,
     ImageUploadResponse, UserRole
 )
 from models.order import OrderStatus
@@ -312,6 +313,64 @@ async def delete_category(
         return {"message": "Category deleted successfully"}
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+# Brands
+@router.get("/brands")
+async def get_all_brands(
+    include_inactive: bool = Query(False),
+    current_user: dict = Depends(require_admin)
+):
+    """Get all brands with product counts"""
+    return await admin_service.get_all_brands(include_inactive)
+
+@router.post("/brands", status_code=status.HTTP_201_CREATED)
+async def create_brand(
+    brand_data: BrandCreate,
+    current_user: dict = Depends(require_admin)
+):
+    """Create a new brand"""
+    try:
+        return await admin_service.create_brand(brand_data)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+@router.put("/brands/{brand_id}")
+async def update_brand(
+    brand_id: str,
+    update_data: BrandUpdate,
+    current_user: dict = Depends(require_admin)
+):
+    """Update a brand"""
+    try:
+        brand = await admin_service.update_brand(brand_id, update_data)
+        if not brand:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Brand not found")
+        return brand
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+@router.delete("/brands/{brand_id}")
+async def delete_brand(
+    brand_id: str,
+    current_user: dict = Depends(require_admin)
+):
+    """Delete a brand"""
+    try:
+        success = await admin_service.delete_brand(brand_id)
+        if not success:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Brand not found")
+        return {"message": "Brand deleted successfully"}
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+@router.post("/brands/migrate")
+async def migrate_brands(current_user: dict = Depends(require_admin)):
+    """Migrate existing brands from products to brands collection (one-time use)"""
+    result = await admin_service.migrate_existing_brands()
+    return {
+        "message": "Brand migration completed",
+        "details": result
+    }
 
 # Promotions
 @router.get("/promotions")

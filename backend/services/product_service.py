@@ -245,7 +245,15 @@ class ProductService:
         return result.modified_count > 0
     
     async def get_brands(self) -> List[str]:
-        """Get all unique brands"""
+        """Get all active brands from brands collection"""
+        # First try to get from brands collection
+        brands_collection = self.db["brands"]
+        brands = await brands_collection.find({"is_active": True}, {"name": 1, "_id": 0}).sort("name", 1).to_list(500)
+        
+        if brands:
+            return [b["name"] for b in brands if b.get("name")]
+        
+        # Fallback: get unique brands from products if brands collection is empty
         brands = await self.products.distinct("brand", {"is_active": True, "brand": {"$ne": None}})
         return sorted([b for b in brands if b])
     

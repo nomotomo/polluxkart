@@ -23,6 +23,7 @@ import {
   AdminProducts,
   AdminOrders,
   AdminCategories,
+  AdminBrands,
   AdminPromotions,
   AdminUsers,
 } from './pages/admin';
@@ -49,6 +50,7 @@ function App() {
                 <Route path="products" element={<AdminProducts />} />
                 <Route path="orders" element={<AdminOrders />} />
                 <Route path="categories" element={<AdminCategories />} />
+                <Route path="brands" element={<AdminBrands />} />
                 <Route path="promotions" element={<AdminPromotions />} />
                 <Route path="users" element={<AdminUsers />} />
               </Route>
