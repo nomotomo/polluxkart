@@ -23,6 +23,7 @@ import {
   AdminProducts,
   AdminOrders,
   AdminCategories,
+  AdminBrands,
   AdminPromotions,
   AdminUsers,
 } from './pages/admin';
