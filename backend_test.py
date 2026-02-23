@@ -328,6 +328,7 @@ class BrandAPITester:
         print(f"Target URL: {BASE_URL}")
         
         # Run tests in logical order
+        setup_success = await self.check_admin_setup_status()
         await self.test_admin_login()
         
         if not self.token:
