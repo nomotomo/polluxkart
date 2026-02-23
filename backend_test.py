@@ -15,7 +15,7 @@ import os
 # Configuration
 BASE_URL = "https://admin-brand-feature.preview.emergentagent.com/api"
 TEST_ADMIN = {
-    "email": "test@polluxkart.com",
+    "identifier": "test@polluxkart.com",  # Can be email or phone
     "password": "Test@123"
 }
 
