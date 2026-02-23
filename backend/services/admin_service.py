@@ -3,6 +3,7 @@ from config.database import Database
 from models.admin import (
     DashboardStats, PromotionCreate, PromotionResponse, PromotionUpdate,
     ProductCreate, ProductUpdate, CategoryCreate, CategoryUpdate,
+    BrandCreate, BrandUpdate, BrandResponse,
     PromotionStatus, UserRole
 )
 from models.order import OrderStatus
