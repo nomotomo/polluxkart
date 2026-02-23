@@ -5,9 +5,8 @@ import pytest
 import uuid
 import os
 
-# BASE_URL: Use environment variable if available, otherwise fallback to production URL
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL') or os.environ.get('API_BASE_URL') or 'https://admin-brand-feature.preview.emergentagent.com'
-BASE_URL = BASE_URL.rstrip('/')
+# Import BASE_URL from conftest
+from tests.conftest import BASE_URL
 
 
 class TestAuthRegister:
@@ -39,7 +38,7 @@ class TestAuthRegister:
         assert isinstance(data["access_token"], str)
         assert len(data["access_token"]) > 0
     
-    def test_register_duplicate_phone_fails(self, api_client, test_user_phone):
+    def test_register_duplicate_phone_fails(self, api_client, test_user_phone, ensure_test_user):
         """Test registration with duplicate phone fails"""
         unique_id = str(uuid.uuid4())[:8]
         user_data = {
