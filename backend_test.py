@@ -80,7 +80,69 @@ class BrandAPITester:
         except Exception as e:
             return 0, {"error": f"Request failed: {str(e)}"}
 
-    async def test_admin_login(self):
+    async def check_admin_setup_status(self):
+        """Check if admin setup is needed"""
+        print("\n=== Checking Admin Setup Status ===")
+        
+        status, data = await self.make_request("GET", "/admin/setup/status", auth=False)
+        
+        if status == 200:
+            admin_exists = data.get("admin_exists", False)
+            setup_available = data.get("setup_available", False)
+            
+            print(f"   Admin exists: {admin_exists}")
+            print(f"   Setup available: {setup_available}")
+            
+            if not admin_exists and setup_available:
+                return await self.create_initial_admin()
+            elif admin_exists:
+                return await self.check_existing_admins()
+            else:
+                self.log_result("setup_check", False, "Unknown setup state")
+                return False
+        else:
+            self.log_result("setup_check", False, f"Status {status}: {data}")
+            return False
+
+    async def check_existing_admins(self):
+        """Check existing admin users"""
+        print("\n=== Checking Existing Admins ===")
+        
+        status, data = await self.make_request("GET", "/admin/setup/admin-info", auth=False)
+        
+        if status == 200:
+            admin_count = data.get("admin_count", 0)
+            admins = data.get("admins", [])
+            
+            print(f"   Found {admin_count} admin(s)")
+            for admin in admins:
+                print(f"   - {admin.get('email', 'No email')} ({admin.get('role', 'unknown role')})")
+            
+            return admin_count > 0
+        else:
+            print(f"   Could not check admins: Status {status}")
+            return False
+
+    async def create_initial_admin(self):
+        """Create initial admin user"""
+        print("\n=== Creating Initial Admin ===")
+        
+        admin_data = {
+            "email": "test@polluxkart.com",
+            "phone": "9876543210",
+            "name": "Test Admin",
+            "password": "Test@123",
+            "setup_key": "POLLUXKART_INITIAL_ADMIN_2025"
+        }
+        
+        status, data = await self.make_request("POST", "/admin/setup/initial-admin", admin_data, auth=False)
+        
+        if status == 201:
+            print(f"   ✅ Created admin user: {data.get('user', {}).get('email', 'Unknown')}")
+            return True
+        else:
+            print(f"   ❌ Failed to create admin: Status {status}, Response: {data}")
+            return False
         """Test admin login and get JWT token"""
         print("\n=== Testing Admin Authentication ===")
         
