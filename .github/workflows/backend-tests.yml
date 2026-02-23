@@ -48,7 +48,31 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-asyncio pytest-cov httpx
 
-      - name: Run tests with coverage
+      - name: Start FastAPI server
+        run: |
+          # Start the server in background
+          uvicorn server:app --host 0.0.0.0 --port 8001 &
+          
+          # Wait for server to be ready
+          echo "Waiting for server to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8001/api/health > /dev/null 2>&1; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 1
+          done
+          
+          # Verify server is running
+          curl -s http://localhost:8001/api/health || exit 1
+        env:
+          MONGO_URL: mongodb://localhost:27017
+          DB_NAME: polluxkart_test
+          JWT_SECRET: test-secret-key-for-ci
+          PYTHONPATH: .
+
+      - name: Run integration tests
         id: test
         run: |
           echo "## Backend Test Results 🧪" >> $GITHUB_STEP_SUMMARY
@@ -78,6 +102,7 @@ jobs:
           MONGO_URL: mongodb://localhost:27017
           DB_NAME: polluxkart_test
           JWT_SECRET: test-secret-key-for-ci
+          API_BASE_URL: http://localhost:8001
           PYTHONPATH: .
 
       - name: Upload coverage report
