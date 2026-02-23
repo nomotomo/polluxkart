@@ -92,14 +92,19 @@ class TestAuthLogin:
         assert "id" in data["user"]
         assert "name" in data["user"]
     
-    def test_login_with_phone_success(self, api_client, test_user_phone, ensure_test_user):
+    def test_login_with_phone_success(self, api_client, ensure_test_user):
         """Test successful login with phone number"""
         # Skip if test user couldn't be created
         if not ensure_test_user:
             pytest.skip("Test user could not be created")
         
+        # Get the actual phone from ensure_test_user
+        user_phone = ensure_test_user.get("user", {}).get("phone")
+        if not user_phone:
+            pytest.skip("Test user has no phone number")
+        
         login_data = {
-            "identifier": test_user_phone,
+            "identifier": user_phone,
             "password": "Test@123"
         }
         
