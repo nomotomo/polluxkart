@@ -67,6 +67,7 @@ const AdminLayout = () => {
     { path: '/admin/products', icon: Package, label: 'Products' },
     { path: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
     { path: '/admin/categories', icon: Tag, label: 'Categories' },
+    { path: '/admin/brands', icon: Award, label: 'Brands' },
     { path: '/admin/promotions', icon: Percent, label: 'Promotions' },
     { path: '/admin/users', icon: Users, label: 'Users' },
   ];
