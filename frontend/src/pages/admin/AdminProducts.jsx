@@ -364,12 +364,22 @@ const AdminProducts = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="brand">Brand</Label>
-                <Input
-                  id="brand"
-                  value={formData.brand}
-                  onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                  placeholder="Brand name"
-                />
+                <Select
+                  value={formData.brand || ""}
+                  onValueChange={(value) => setFormData({ ...formData, brand: value === "_none" ? "" : value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select brand" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_none">No Brand</SelectItem>
+                    {brands.map((brand) => (
+                      <SelectItem key={brand} value={brand}>
+                        {brand}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
