@@ -282,12 +282,16 @@ const AdminProducts = () => {
                             src={product.images?.[0] || product.image}
                             alt={product.name}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.error('Image load error:', product.images?.[0] || product.image);
+                              e.target.style.display = 'none';
+                              e.target.nextSibling?.classList.remove('hidden');
+                            }}
                           />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <ImageIcon className="h-6 w-6 text-gray-400" />
-                          </div>
-                        )}
+                        ) : null}
+                        <div className={`w-full h-full flex items-center justify-center ${(product.images?.[0] || product.image) ? 'hidden' : ''}`}>
+                          <ImageIcon className="h-6 w-6 text-gray-400" />
+                        </div>
                       </div>
                       <div>
                         <p className="font-medium">{product.name}</p>
