@@ -85,15 +85,6 @@ export const uploadProductImage = async (file, productId, onProgress = null) => 
 export const uploadCategoryImage = async (file, categoryId, onProgress = null) => {
   return uploadImage(file, 'category', categoryId, onProgress);
 };
-  // Prepend base URL to local uploads (use raw backend URL without /api suffix)
-  const backendBaseUrl = process.env.REACT_APP_BACKEND_URL || '';
-  return results.map(result => {
-    if (result.url && result.url.startsWith('/api/')) {
-      result.url = `${backendBaseUrl}${result.url}`;
-    }
-    return result;
-  });
-};
 
 // Products
 export const createProduct = async (productData) => {
