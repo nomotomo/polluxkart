@@ -132,8 +132,6 @@ class S3Service:
                 Key=key,
                 Body=file_content,
                 ContentType=content_type,
-                # Make publicly readable
-                ACL='public-read',
                 # Cache for 1 year (images rarely change)
                 CacheControl='max-age=31536000',
             )
