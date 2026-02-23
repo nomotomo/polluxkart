@@ -143,6 +143,8 @@ class BrandAPITester:
         else:
             print(f"   ❌ Failed to create admin: Status {status}, Response: {data}")
             return False
+
+    async def test_admin_login(self):
         """Test admin login and get JWT token"""
         print("\n=== Testing Admin Authentication ===")
         
