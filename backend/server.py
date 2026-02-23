@@ -14,6 +14,7 @@ from routes import (
 from routes.admin import router as admin_router
 from routes.cloudinary_upload import router as cloudinary_router
 from routes.otp import router as otp_router
+from routes.s3_upload import router as s3_upload_router
 
 # Configure logging
 logging.basicConfig(
@@ -88,6 +89,7 @@ app.include_router(inventory_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(cloudinary_router, prefix="/api")
 app.include_router(otp_router, prefix="/api")
+app.include_router(s3_upload_router, prefix="/api")
 
 # Serve uploaded images
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")

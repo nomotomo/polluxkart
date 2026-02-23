@@ -1,32 +1,41 @@
 // Admin Service - API integration for admin operations
 import { API_CONFIG, apiFetch } from './apiConfig';
-import CloudinaryService from './cloudinaryService';
 
 const ADMIN_BASE = '/admin';
+const UPLOAD_BASE = '/upload';
 
 // Dashboard
 export const getDashboardStats = async () => {
   return await apiFetch(`${ADMIN_BASE}/dashboard`, { method: 'GET' });
 };
 
-// Image Upload - Uses Cloudinary if configured, falls back to local
-export const uploadImage = async (file, onProgress = null) => {
+// Check if S3 is configured
+export const getUploadConfig = async () => {
   try {
-    // Try Cloudinary first
-    const isCloudinaryReady = await CloudinaryService.isCloudinaryConfigured();
-    if (isCloudinaryReady) {
-      const result = await CloudinaryService.uploadImage(file, 'products', onProgress);
-      return { url: result.url, filename: result.publicId, size: result.size, content_type: `image/${result.format}` };
-    }
+    const response = await fetch(`${API_CONFIG.baseUrl}${UPLOAD_BASE}/config`);
+    return await response.json();
   } catch (error) {
-    console.warn('Cloudinary upload failed, falling back to local:', error);
+    console.error('Failed to get upload config:', error);
+    return { s3_configured: false };
   }
-  
-  // Fall back to local upload
+};
+
+// Image Upload - Uses S3 if configured, falls back to local
+export const uploadImage = async (file, entityType = 'temp', entityId = null, onProgress = null) => {
   const formData = new FormData();
   formData.append('file', file);
   
-  const response = await fetch(`${API_CONFIG.baseUrl}${ADMIN_BASE}/upload`, {
+  // Determine the upload endpoint based on entity type
+  let uploadUrl;
+  if (entityType === 'product' && entityId) {
+    uploadUrl = `${UPLOAD_BASE}/product/${entityId}`;
+  } else if (entityType === 'category' && entityId) {
+    uploadUrl = `${UPLOAD_BASE}/category/${entityId}`;
+  } else {
+    uploadUrl = `${UPLOAD_BASE}/temp`;
+  }
+  
+  const response = await fetch(`${API_CONFIG.baseUrl}${uploadUrl}`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('polluxkart-token')}`,
@@ -40,52 +49,41 @@ export const uploadImage = async (file, onProgress = null) => {
   }
   
   const result = await response.json();
-  // Prepend base URL to local uploads (use raw backend URL without /api suffix)
-  const backendBaseUrl = process.env.REACT_APP_BACKEND_URL || '';
-  if (result.url && result.url.startsWith('/api/')) {
-    result.url = `${backendBaseUrl}${result.url}`;
-  }
-  return result;
+  return { 
+    url: result.url, 
+    key: result.key,
+    filename: file.name 
+  };
 };
 
-export const uploadMultipleImages = async (files, onProgress = null) => {
-  try {
-    // Try Cloudinary first
-    const isCloudinaryReady = await CloudinaryService.isCloudinaryConfigured();
-    if (isCloudinaryReady) {
-      const results = await CloudinaryService.uploadMultipleImages(files, 'products', onProgress);
-      return results.map(r => ({ url: r.url, filename: r.publicId, size: r.size, content_type: `image/${r.format}` }));
+export const uploadMultipleImages = async (files, entityType = 'temp', entityId = null, onProgress = null) => {
+  // For multiple files, upload one by one
+  const results = [];
+  
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    try {
+      const result = await uploadImage(file, entityType, entityId);
+      results.push(result);
+      
+      if (onProgress) {
+        onProgress((i + 1) / files.length * 100);
+      }
+    } catch (error) {
+      console.error(`Failed to upload ${file.name}:`, error);
     }
-  } catch (error) {
-    console.warn('Cloudinary upload failed, falling back to local:', error);
   }
   
-  // Fall back to local upload
-  const formData = new FormData();
-  files.forEach(file => formData.append('files', file));
-  
-  const response = await fetch(`${API_CONFIG.baseUrl}${ADMIN_BASE}/upload/multiple`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('polluxkart-token')}`,
-    },
-    body: formData,
-  });
-  
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || 'Upload failed');
-  }
-  
-  const results = await response.json();
-  // Prepend base URL to local uploads (use raw backend URL without /api suffix)
-  const backendBaseUrl = process.env.REACT_APP_BACKEND_URL || '';
-  return results.map(result => {
-    if (result.url && result.url.startsWith('/api/')) {
-      result.url = `${backendBaseUrl}${result.url}`;
-    }
-    return result;
-  });
+  return results;
+};
+
+// Legacy upload functions for backward compatibility
+export const uploadProductImage = async (file, productId, onProgress = null) => {
+  return uploadImage(file, 'product', productId, onProgress);
+};
+
+export const uploadCategoryImage = async (file, categoryId, onProgress = null) => {
+  return uploadImage(file, 'category', categoryId, onProgress);
 };
 
 // Products
@@ -212,8 +210,11 @@ export const cleanSeedData = async () => {
 
 const AdminService = {
   getDashboardStats,
+  getUploadConfig,
   uploadImage,
   uploadMultipleImages,
+  uploadProductImage,
+  uploadCategoryImage,
   createProduct,
   updateProduct,
   deleteProduct,
