@@ -10,10 +10,10 @@ Features tested:
 import pytest
 import requests
 import os
+import time
 
-# BASE_URL from environment
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL') or 'https://admin-brand-feature.preview.emergentagent.com'
-BASE_URL = BASE_URL.rstrip('/')
+# Import BASE_URL from conftest
+from tests.conftest import BASE_URL
 
 # Test credentials
 TEST_USER_EMAIL = "test@polluxkart.com"
