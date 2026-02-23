@@ -55,6 +55,7 @@ import { toast } from 'sonner';
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -83,12 +84,14 @@ const AdminProducts = () => {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [productsData, categoriesData] = await Promise.all([
+      const [productsData, categoriesData, brandsData] = await Promise.all([
         ProductService.getProducts({ pageSize: 50 }),
         ProductService.getCategories(),
+        ProductService.getBrands(),
       ]);
       setProducts(productsData.products || []);
       setCategories(categoriesData || []);
+      setBrands(brandsData || []);
     } catch (error) {
       toast.error('Failed to load products');
       console.error(error);
