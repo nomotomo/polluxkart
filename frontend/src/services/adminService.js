@@ -210,8 +210,11 @@ export const cleanSeedData = async () => {
 
 const AdminService = {
   getDashboardStats,
+  getUploadConfig,
   uploadImage,
   uploadMultipleImages,
+  uploadProductImage,
+  uploadCategoryImage,
   createProduct,
   updateProduct,
   deleteProduct,
