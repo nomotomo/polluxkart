@@ -38,6 +38,7 @@ Collections:
 - `reviews` - Product reviews
 - `stock_movements` - Inventory audit trail
 - `promotions` - Discount codes and promotions
+- `brands` - Product brands
 
 ## API Endpoints
 
