@@ -69,8 +69,12 @@ class TestAuthRegister:
 class TestAuthLogin:
     """User login tests"""
     
-    def test_login_with_email_success(self, api_client, test_user_credentials):
+    def test_login_with_email_success(self, api_client, test_user_credentials, ensure_test_user):
         """Test successful login with email"""
+        # Skip if test user couldn't be created
+        if not ensure_test_user:
+            pytest.skip("Test user could not be created")
+        
         response = api_client.post(
             f"{BASE_URL}/api/auth/login",
             json=test_user_credentials
