@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr
 from models.admin import (
     DashboardStats, PromotionCreate, PromotionResponse, PromotionUpdate,
     ProductCreate, ProductUpdate, CategoryCreate, CategoryUpdate,
+    BrandCreate, BrandUpdate,
     ImageUploadResponse, UserRole
 )
 from models.order import OrderStatus
