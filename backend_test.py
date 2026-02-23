@@ -91,8 +91,8 @@ class BrandAPITester:
             auth=False
         )
         
-        if status == 200 and isinstance(data, dict) and "token" in data:
-            self.token = data["token"]
+        if status == 200 and isinstance(data, dict) and "access_token" in data:
+            self.token = data["access_token"]
             user_role = data.get("user", {}).get("role", "")
             if user_role in ["admin", "super_admin"]:
                 self.log_result("auth_login", True, f"Successfully logged in as {user_role}")
