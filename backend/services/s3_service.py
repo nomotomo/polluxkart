@@ -240,7 +240,6 @@ class S3Service:
                 Bucket=self.bucket_name,
                 CopySource={'Bucket': self.bucket_name, 'Key': old_key},
                 Key=new_key,
-                ACL='public-read',
                 CacheControl='max-age=31536000',
             )
             
