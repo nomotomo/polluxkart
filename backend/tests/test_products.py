@@ -4,9 +4,8 @@ Products API tests - List, filter, sort, get single product, reviews
 import pytest
 import os
 
-# BASE_URL: Use environment variable if available, otherwise fallback to production URL
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL') or os.environ.get('API_BASE_URL') or 'https://admin-brand-feature.preview.emergentagent.com'
-BASE_URL = BASE_URL.rstrip('/')
+# Import BASE_URL from conftest
+from tests.conftest import BASE_URL
 
 
 class TestProductsList:
