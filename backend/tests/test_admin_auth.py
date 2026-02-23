@@ -135,13 +135,32 @@ class TestAdminAuth:
                     if "user" in login_data_resp and "role" in login_data_resp["user"]:
                         assert login_data_resp["user"]["role"] == "user"
     
-    def test_regular_user_cannot_access_admin(self, api_client, ensure_test_user, test_user_credentials):
+    def test_regular_user_cannot_access_admin(self, api_client, ensure_test_user):
         """Test that regular users cannot access admin endpoints"""
         if not ensure_test_user:
             pytest.skip("Test user could not be created")
         
-        # Login as regular user
-        login_response = api_client.post(f"{BASE_URL}/api/auth/login", json=test_user_credentials)
+        # Create a new regular user to ensure they don't have admin role
+        import uuid
+        unique_id = str(uuid.uuid4())[:8]
+        
+        register_data = {
+            "email": f"TEST_noadmin_{unique_id}@polluxkart.com",
+            "phone": f"+91{unique_id}54321",
+            "name": f"Non-Admin User {unique_id}",
+            "password": "TestPass@123"
+        }
+        
+        register_response = api_client.post(f"{BASE_URL}/api/auth/register", json=register_data)
+        if register_response.status_code != 201:
+            pytest.skip("Could not create test user")
+        
+        # Login as the new regular user
+        login_data = {
+            "identifier": register_data["email"],
+            "password": register_data["password"]
+        }
+        login_response = api_client.post(f"{BASE_URL}/api/auth/login", json=login_data)
         if login_response.status_code != 200:
             pytest.skip("Could not login as test user")
         
