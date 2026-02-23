@@ -208,6 +208,38 @@ export const cleanSeedData = async () => {
   });
 };
 
+// Brands
+export const getAdminBrands = async (includeInactive = false) => {
+  const params = includeInactive ? '?include_inactive=true' : '';
+  return await apiFetch(`${ADMIN_BASE}/brands${params}`, { method: 'GET' });
+};
+
+export const createBrand = async (brandData) => {
+  return await apiFetch(`${ADMIN_BASE}/brands`, {
+    method: 'POST',
+    body: JSON.stringify(brandData),
+  });
+};
+
+export const updateBrand = async (brandId, updateData) => {
+  return await apiFetch(`${ADMIN_BASE}/brands/${brandId}`, {
+    method: 'PUT',
+    body: JSON.stringify(updateData),
+  });
+};
+
+export const deleteBrand = async (brandId) => {
+  return await apiFetch(`${ADMIN_BASE}/brands/${brandId}`, {
+    method: 'DELETE',
+  });
+};
+
+export const migrateBrands = async () => {
+  return await apiFetch(`${ADMIN_BASE}/brands/migrate`, {
+    method: 'POST',
+  });
+};
+
 const AdminService = {
   getDashboardStats,
   getUploadConfig,
@@ -222,6 +254,11 @@ const AdminService = {
   createCategory,
   updateCategory,
   deleteCategory,
+  getAdminBrands,
+  createBrand,
+  updateBrand,
+  deleteBrand,
+  migrateBrands,
   getPromotions,
   createPromotion,
   updatePromotion,
