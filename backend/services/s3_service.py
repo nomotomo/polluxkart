@@ -306,11 +306,9 @@ class S3Service:
                 Key=key,
                 Fields={
                     'Content-Type': content_type,
-                    'acl': 'public-read',
                 },
                 Conditions=[
                     {'Content-Type': content_type},
-                    {'acl': 'public-read'},
                     ['content-length-range', 1, 10 * 1024 * 1024],  # 1 byte to 10MB
                 ],
                 ExpiresIn=expiration
