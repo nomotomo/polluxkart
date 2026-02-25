@@ -13,6 +13,7 @@ from services.cart_service import CartService
 from services.inventory_service import InventoryService
 from utils.email import EmailService
 
+
 class OrderService:
     def __init__(self):
         self.db = get_db()
@@ -38,6 +39,7 @@ class OrderService:
         # Batch check inventory for all items (avoid N+1)
         product_ids = [item.product_id for item in cart.items]
         inventory_cursor = self.db[COLLECTIONS['inventory']].find(
+
             {"product_id": {"$in": product_ids}},
             {"_id": 0}
         )
@@ -51,6 +53,7 @@ class OrderService:
             if available < item.quantity:
                 raise ValueError(f"Insufficient stock for {item.name}. Available: {available}")
         
+                    image_url=product.image_url,
         # Create order items
         order_items = [
             OrderItem(
